@@ -1,16 +1,12 @@
 const needle = require('needle'),
-    cheerio = require("cheerio");
-
+    A101Parser = require("../js/A101Parser");
 
 exports.homePage = function (req, res) {
-    var URL = 'https://a101.ru/kvartiry/?complex=17&group=0';
-
+    var URL = 'https://a101.ru/objects/filter/?complex=17&group=0';
+    
     needle.get(URL, function (err, res) {
         if (err) throw err;
-        var $ = cheerio.load(res.body);
-        var links = $('.flat-table-row').attr('href')
-        console.log(links);
-        console.log(res.statusCode);
+        A101Parser.getRoomsData(res.body.html);
     });
 
     res.send([{
