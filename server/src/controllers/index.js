@@ -1,15 +1,18 @@
-const needle = require('needle'),
-    A101Parser = require("../js/A101Parser");
+const A101Parser = require("../js/A101Parser");
 
-exports.homePage = function (req, res) {
-    var URL = 'https://a101.ru/objects/filter/?complex=17&group=0';
-    
-    needle.get(URL, function (err, res) {
-        if (err) throw err;
-        A101Parser.getRoomsData(res.body.html);
+exports.GetA101Flats = function (req, res) {
+    A101Parser.getRoomsData().then(flats => {
+        res.send(flats);
     });
+}
 
-    res.send([{
-        flat: "init start"
-    }]);
+exports.getA101FilterParams = function (req, res) {
+    
+    console.log("req.params",req.query)
+    
+    A101Parser.getFilterParams(req.query).then(params => {
+        res.send(params);
+    }, function(err){
+        res.send({err:err})
+    });
 }
