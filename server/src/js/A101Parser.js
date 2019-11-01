@@ -1,12 +1,15 @@
 const needle = require('needle'),
-    cheerio = require("cheerio");
-https = require('https');
+    cheerio = require("cheerio"),
+    https = require('https'),
+    urlUtils = require('./urlUtils');   
 
 const BASE_URL = "https://a101.ru"
 
-exports.getRoomsData = function () {
+exports.getRoomsData = function (query) {
+    const params = urlUtils.queryToString(query);
+    
     return new Promise((resolve, reject) => {
-        var URL = `${BASE_URL}/objects/filter/`;
+        var URL = `${BASE_URL}/objects/filter/${params}`;
         var flats = [];
 
         needle.get(URL, function (err, res) {
@@ -31,7 +34,7 @@ exports.getRoomsData = function () {
                     if (ind == 0) {
                         let imgsDom = $(divDom).children("img");
                         if (imgsDom.length > 0) {
-                            flat.imgSrc = $(imgsDom[0]).attr('src');
+                            flat.imgSrc = `${BASE_URL}/${$(imgsDom[0]).attr('src')}`;
                         }
                     } else if (ind == 1) {
                         flat.roomsCount = $(divDom).text().trim();
@@ -79,19 +82,19 @@ exports.getRoomsData = function () {
 }
 
 exports.getFilterParams = function (query) {
-    const params = queryToString(query);
+    const params = urlUtils.queryToString(query);
     return new Promise((resolve, reject) => {
-        https.get(`${BASE_URL}/objects/filter/facets/`, (resp) => {
+        https.get(`${BASE_URL}/objects/filter/facets/${params}`, (resp) => {
             let data = '';
 
             resp.on('data', (chunk) => {
                 data += chunk;
             });
 
-            resp.on('end', () => {              
+            resp.on('end', () => {
                 let filterData = JSON.parse(data)
                 var complexNameUrl = `${BASE_URL}/objects/filter/applied/?group=0`
-                if(filterData){
+                if (filterData) {
                     filterData.facets.complex.forEach(complexId => {
                         complexNameUrl += `&complex=${complexId}`
                     });
@@ -103,12 +106,12 @@ exports.getFilterParams = function (query) {
                             data += chunk;
                         });
 
-                        resp.on('end',()=>{
-                            filterData.facets["complexNames"] = JSON.parse(data).complex ? JSON.parse(data).complex.split(", "):JSON.parse(data).complex.split(", ")
+                        resp.on('end', () => {
+                            filterData.facets["complexNames"] = JSON.parse(data).complex ? JSON.parse(data).complex.split(", ") : JSON.parse(data).complex.split(", ")
                             resolve(filterData);
                         })
 
-                        resp.on('error',(err)=>{
+                        resp.on('error', (err) => {
                             resolve(filterData);
                         });
                     })
@@ -122,24 +125,6 @@ exports.getFilterParams = function (query) {
         })
     })
 
-}
-
-function queryToString(query){
-    var queryStr = "";
-    for(let key in query){
-        let params = ''
-        if(query[key] instanceof Array){
-            query[key].forEach(param=>{
-                params
-            })
-        }
-        if(queryStr.length > 0){
-            queryStr += `?${key}=${query[key]}`
-        }else{
-            queryStr += `&${key}=${query[key]}`
-        }
-    }
-    return queryStr
 }
 
 
