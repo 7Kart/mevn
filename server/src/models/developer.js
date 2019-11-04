@@ -7,7 +7,7 @@ var DevelopersSchema = new Schema({
     projects: [{
         originId: Number,
         name: String,
-        flatIds:Array
+        flatIds: [{ type: Schema.Types.ObjectId, ref: 'flats' }]        
     }]
 });
 

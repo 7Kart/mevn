@@ -9,6 +9,42 @@ exports.GetA101Flats = function (req, res) {
     });
 }
 
+//moove to A101.js
+exports.ParceAllA101Flats = function (req, res) {
+
+
+    let ParamPromise = A101FilterParams = A101Parser.getFilterParams()
+
+    const skipCount = 20;
+
+    ParamPromise.then(async (params) => {
+        if (params) {
+            let totalFlatsCount = params.count;
+            let offset = 0;
+            var allFlats = []
+            var promises = []
+            while (offset < totalFlatsCount) {
+                promises.push(A101Parser.getRoomsData({
+                    group: 0,
+                    limit: skipCount,
+                    offset: offset
+                }));
+                offset += skipCount
+            }
+            await Promise.all(promises).then(flats => {
+                flats.forEach((flat) => {
+                    allFlats.push(...flat)
+                });
+                res.send({ data: allFlats, total: allFlats.length })
+            });
+
+        }
+    }, err => {
+        throw err;
+    });
+
+}
+
 exports.getA101FilterParams = function (req, res) {
     A101Parser.getFilterParams(req.query).then(params => {
         res.send(params);
@@ -18,39 +54,14 @@ exports.getA101FilterParams = function (req, res) {
 }
 
 exports.GetA101FlatsHistory = function (req, res) {
-    Developer.find((err, developers) => {
-        if (err) throw err;
-        console.log(`developers, ${developers}`);
-    });
+    Developer
+        .find()
+        .populate('projects.flatIds')
+        .exec((err, developers) => {
+            res.send({
+                data: developers
+            })
+        })
 }
 
-exports.test = function (req, res) {
-    var test = {
-        "href": "/kvartiry/5741/",
-        "id": 5741,
-        "imgSrc": "https://a101.ru//media/images/render/flats/11-21-43_small.jpg",
-        "roomsCount": "1",
-        "district": "Москва А101",
-        "pavilion": "21",
-        "floor": 12,
-        "maxFloor": 15,
-        "area": "34,8 м2",
-        "dateFinished": "2019-07-31T21:00:00.000Z",
-        "dateFinishedStr": "Август 2019 г.",
-        "prisePerMeterStr": "158 046 ₽/м",
-        "prisePerMeter": 158046,
-        "coastStr": "5 500 000 ₽",
-        "coast": 5500000,
-        "mortgage-rshb": false,
-        "business": false,
-        "ignore": true,
-        "design": false,
-        "whitebox": false,
-        "fursnishing": false
-    }
 
-    var flat = new Flat(test);
-    flat.save((err, newFlat) => {
-        res.send({ data: newFlat });
-    })
-}

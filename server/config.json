@@ -1,3 +1,0 @@
-{
-    "mongodb+srv":"mongo-user:<password>@cluster0-i35gr.mongodb.net/test?retryWrites=true&w=majority"
-}

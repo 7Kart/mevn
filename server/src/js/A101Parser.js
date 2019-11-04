@@ -5,7 +5,11 @@ const needle = require('needle'),
 
 const BASE_URL = "https://a101.ru"
 
-exports.getRoomsData = function (query) {
+exports.getRoomsData = ParseFlatsList;
+exports.getFilterParams = getFilterParams;
+
+//parse flats from list https://a101.ru/kvartiry/?group=0&complex=17
+function ParseFlatsList(query) {
     const params = urlUtils.queryToString(query);
     
     return new Promise((resolve, reject) => {
@@ -81,7 +85,8 @@ exports.getRoomsData = function (query) {
     })
 }
 
-exports.getFilterParams = function (query) {
+//get all params value for https://a101.ru/objects query
+function getFilterParams (query) {
     const params = urlUtils.queryToString(query);
     return new Promise((resolve, reject) => {
         https.get(`${BASE_URL}/objects/filter/facets/${params}`, (resp) => {
@@ -121,13 +126,11 @@ exports.getFilterParams = function (query) {
             resp.on("error", (err) => {
                 reject(err);
             });
-
-        })
-    })
-
+        });
+    });
 }
 
-
+//parse floor div
 function parceFloor(textValue) {
     if (textValue) {
         let floorStr = textValue.replace(/[\n\r\s]/g, "");
@@ -138,6 +141,7 @@ function parceFloor(textValue) {
     return null;
 }
 
+//convert dateformat 'mmmm YYYYY г.' в new Date()
 function convertDate(textValue) {
     if (textValue) {
         let month = textValue.split(" ")[0];
