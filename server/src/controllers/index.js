@@ -12,11 +12,8 @@ exports.GetA101Flats = function (req, res) {
 //moove to A101.js
 exports.ParceAllA101Flats = function (req, res) {
 
-
     let ParamPromise = A101FilterParams = A101Parser.getFilterParams()
-
-    const skipCount = 20;
-
+    const skipCount = 100;
     ParamPromise.then(async(params) => {
         if (params) {
             let totalFlatsCount = params.count;
@@ -35,8 +32,12 @@ exports.ParceAllA101Flats = function (req, res) {
 
             await Promise.all(promises).then(flats => {
                 flats.forEach((flat) => {
+                    var flatId = flat.map((item)=>{
+                        return item.idOrigin;
+                    })
+                    console.log('flatId', flatId);
                     allFlats.push(...flat)
-                });
+                });                
                 res.send({ data: allFlats, total: allFlats.length })
             });
 
@@ -44,8 +45,8 @@ exports.ParceAllA101Flats = function (req, res) {
     }, err => {
         throw err;
     });
-
 }
+
 
 exports.getA101FilterParams = function (req, res) {
     A101Parser.getFilterParams(req.query).then(params => {

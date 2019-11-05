@@ -1,7 +1,7 @@
 const needle = require('needle'),
     cheerio = require("cheerio"),
     https = require('https'),
-    urlUtils = require('./urlUtils');   
+    urlUtils = require('./urlUtils');
 
 const BASE_URL = "https://a101.ru"
 
@@ -9,14 +9,14 @@ exports.getRoomsData = ParseFlatsList;
 exports.getFilterParams = getFilterParams;
 
 //parse flats from list https://a101.ru/kvartiry/?group=0&complex=17
-function ParseFlatsList(query) {    
+function ParseFlatsList(query) {
     return new Promise((resolve, reject) => {
-        
+
         const params = urlUtils.queryToString(query);
         var URL = `${BASE_URL}/objects/filter/${params}`;
-        
-        needle.get(URL, function (err, res) {
-            console.log(`url ${URL}`)
+        needle.get(URL,{
+            open_timeout: 15000
+        }, (err, res) => {
             if (err) reject(err);
             var flats = [];
             var $ = cheerio.load(res.body.html, {
@@ -29,8 +29,8 @@ function ParseFlatsList(query) {
                 let flat = {};
                 const linkDom = $(divRoom).children('a')[0];
                 flat.href = linkDom.attribs.href;
-                if (flat.href) { 
-                    flat.id = getNumbers(flat.href);
+                if (flat.href) {
+                    flat.idOrigin = getNumbers(flat.href);
                 }
                 let linksDivsInfo = $(linkDom).children();
 
@@ -72,9 +72,9 @@ function ParseFlatsList(query) {
                 DomClassName.feature.forEach(className => {
                     let featureDiv = $(divRoom).find(`.${className}`);
                     if (featureDiv.length > 0) {
-                        flat[className] = true;
+                        flat[className.replace('-','')] = true;
                     } else {
-                        flat[className] = false;
+                        flat[className.replace('-','')] = false;
                     }
                 });
 
@@ -86,7 +86,7 @@ function ParseFlatsList(query) {
 }
 
 //get all params value for https://a101.ru/objects query
-function getFilterParams (query) {
+function getFilterParams(query) {
     const params = urlUtils.queryToString(query);
     return new Promise((resolve, reject) => {
         https.get(`${BASE_URL}/objects/filter/facets/${params}`, (resp) => {
