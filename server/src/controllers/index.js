@@ -17,12 +17,13 @@ exports.ParceAllA101Flats = function (req, res) {
 
     const skipCount = 20;
 
-    ParamPromise.then(async (params) => {
+    ParamPromise.then(async(params) => {
         if (params) {
             let totalFlatsCount = params.count;
             let offset = 0;
             var allFlats = []
             var promises = []
+
             while (offset < totalFlatsCount) {
                 promises.push(A101Parser.getRoomsData({
                     group: 0,
@@ -31,6 +32,7 @@ exports.ParceAllA101Flats = function (req, res) {
                 }));
                 offset += skipCount
             }
+
             await Promise.all(promises).then(flats => {
                 flats.forEach((flat) => {
                     allFlats.push(...flat)

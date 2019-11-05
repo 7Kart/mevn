@@ -9,16 +9,16 @@ exports.getRoomsData = ParseFlatsList;
 exports.getFilterParams = getFilterParams;
 
 //parse flats from list https://a101.ru/kvartiry/?group=0&complex=17
-function ParseFlatsList(query) {
-    const params = urlUtils.queryToString(query);
-    
+function ParseFlatsList(query) {    
     return new Promise((resolve, reject) => {
+        
+        const params = urlUtils.queryToString(query);
         var URL = `${BASE_URL}/objects/filter/${params}`;
-        var flats = [];
-
+        
         needle.get(URL, function (err, res) {
+            console.log(`url ${URL}`)
             if (err) reject(err);
-
+            var flats = [];
             var $ = cheerio.load(res.body.html, {
                 normalizeWhitespace: true,
             });
@@ -29,7 +29,7 @@ function ParseFlatsList(query) {
                 let flat = {};
                 const linkDom = $(divRoom).children('a')[0];
                 flat.href = linkDom.attribs.href;
-                if (flat.href) {
+                if (flat.href) { 
                     flat.id = getNumbers(flat.href);
                 }
                 let linksDivsInfo = $(linkDom).children();
