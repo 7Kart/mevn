@@ -1,6 +1,5 @@
 const Developer = require("../models/developer");
 const Flat = require("../models/flat");
-const async = require("async");
 const A101Repository = require("../core/DataProviders/A101/Repository")
 
 exports.GetA101Flats = function (req, res) {
@@ -13,16 +12,19 @@ exports.GetA101Flats = function (req, res) {
 //moove to A101.js
 exports.ParceAllA101Flats = function (req, res) {
     A101Repository.getAllFlats()
-    .then((flats)=>{
-        res.send(flats);
-    })
+        .then((flats) => {
+            res.send(flats);
+        })
 }
 
 exports.ParceAllA101FlatsAsync = function (req, res) {
     A101Repository.getAsyncAllFlats()
-    .then((flats)=>{
-        res.send(flats);
-    })
+        .then((flats) => {
+            res.send(flats);
+        }).catch((err) => {
+            console.log('err', err);
+            res.send({ status: 403 })
+        })
 }
 
 

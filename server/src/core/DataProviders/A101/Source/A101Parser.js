@@ -13,20 +13,29 @@ function ParseFlatsList(query) {
     return new Promise((resolve, reject) => {
 
         const params = urlUtils.queryToString(query);
-        var URL = `${BASE_URL}/objects/filter/${params}`;
-        needle.get(URL,{
-            open_timeout: 50000
-        }, (err, res) => {
-            //bug (when slow internet and pages get async)
-            if(!res){
-                return resolve([]);
-            }
 
-            if (err) reject(err);
+        var URL = `${BASE_URL}/objects/filter/${params}`;
+
+        // var URL = `www.sd.net/objects/filter/${params}`;
+        needle.get(URL, {
+            open_timeout: 10000
+        }, (err, res) => {
+            //bug (when slow internet and pages get async)           
+            if (err) {
+                reject(err);
+            }
             var flats = [];
-            var $ = cheerio.load(res.body.html, {
-                normalizeWhitespace: true,
-            });
+
+            let $ = null;
+            try {
+                $ = cheerio.load(res.body.html, {
+                    normalizeWhitespace: true,
+                });
+            }
+            catch (e) {
+                
+                reject(e)
+            }
 
             const linksListDom = $('.js-flat-list-new-table-item');
 
@@ -77,12 +86,11 @@ function ParseFlatsList(query) {
                 DomClassName.feature.forEach(className => {
                     let featureDiv = $(divRoom).find(`.${className}`);
                     if (featureDiv.length > 0) {
-                        flat[className.replace('-','')] = true;
+                        flat[className.replace('-', '')] = true;
                     } else {
-                        flat[className.replace('-','')] = false;
+                        flat[className.replace('-', '')] = false;
                     }
                 });
-
                 flats.push(flat);
             });
             return resolve(flats);
@@ -131,6 +139,8 @@ function getFilterParams(query) {
             resp.on("error", (err) => {
                 reject(err);
             });
+        }).on("error", (err) => {
+            reject(err);
         });
     });
 }

@@ -3,8 +3,15 @@ const A101Parser = require("../Source/A101Parser");
 //get parallel all A101 flats
 exports.getAsyncAllFlats = function () {
     return new Promise(async(resolve, reject) => {
-        let queryParams = await A101Parser.getFilterParams()
-        
+        let queryParams = null;
+        try
+        {
+            queryParams = await A101Parser.getFilterParams()
+        }    
+        catch(err)
+        {
+            reject(err)
+        }      
         const skipCount = 100;    
         if (queryParams) {
             let totalFlatsCount = queryParams.count;
@@ -25,8 +32,7 @@ exports.getAsyncAllFlats = function () {
                 flats.forEach((flat) => {
                     var flatId = flat.map((item) => {
                         return item.idOrigin;
-                    })
-                    console.log('flatId', flatId);
+                    })                    
                     allFlats.push(...flat)
                 });
             });
