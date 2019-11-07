@@ -1,7 +1,7 @@
 const needle = require('needle'),
     cheerio = require("cheerio"),
     https = require('https'),
-    urlUtils = require('./urlUtils');
+    urlUtils = require('../../../urlUtils');
 
 const BASE_URL = "https://a101.ru"
 
@@ -15,8 +15,13 @@ function ParseFlatsList(query) {
         const params = urlUtils.queryToString(query);
         var URL = `${BASE_URL}/objects/filter/${params}`;
         needle.get(URL,{
-            open_timeout: 15000
+            open_timeout: 50000
         }, (err, res) => {
+            //bug (when slow internet and pages get async)
+            if(!res){
+                return resolve([]);
+            }
+
             if (err) reject(err);
             var flats = [];
             var $ = cheerio.load(res.body.html, {
@@ -80,7 +85,7 @@ function ParseFlatsList(query) {
 
                 flats.push(flat);
             });
-            resolve(flats);
+            return resolve(flats);
         });
     })
 }
