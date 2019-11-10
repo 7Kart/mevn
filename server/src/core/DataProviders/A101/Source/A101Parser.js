@@ -8,6 +8,10 @@ const BASE_URL = "https://a101.ru"
 exports.getRoomsData = ParseFlatsList;
 exports.getFilterParams = getFilterParams;
 
+function ParseDevelopersProjects(){
+
+}
+
 //parse flats from list https://a101.ru/kvartiry/?group=0&complex=17
 function ParseFlatsList(query) {
     return new Promise((resolve, reject) => {
@@ -124,7 +128,8 @@ function getFilterParams(query) {
                             data += chunk;
                         });
 
-                        resp.on('end', () => {
+                        resp.on('end', (req, res) => {
+                            console.log('req, res!!!', complexNameUrl);
                             filterData.facets["complexNames"] = JSON.parse(data).complex ? JSON.parse(data).complex.split(", ") : JSON.parse(data).complex.split(", ")
                             resolve(filterData);
                         })

@@ -1,6 +1,6 @@
-const Developer = require("../models/developer");
-const Flat = require("../models/flat");
-const A101Repository = require("../core/DataProviders/A101/Repository")
+const Developer = require("../models/developer"),
+    Flat = require("../models/flat"),
+    A101Repository = require("../core/DataProviders/A101/Repository");
 
 exports.GetA101Flats = function (req, res) {
     // A101Parser.getRoomsData(req.query).then(flats => {
@@ -29,11 +29,11 @@ exports.ParceAllA101FlatsAsync = function (req, res) {
 
 
 exports.getA101FilterParams = function (req, res) {
-    // A101Parser.getFilterParams(req.query).then(params => {
-    //     res.send(params);
-    // }, function (err) {
-    //     res.send({ err: err })
-    // });
+    A101Repository.getFilterParams(req.query).then(params => {
+        res.send(params);
+    }, function (err) {
+        res.send({ err: err })
+    });
 }
 
 exports.GetA101FlatsHistory = function (req, res) {

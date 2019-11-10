@@ -12,6 +12,8 @@ mongoose.connection.on("connected", () => {
     const app = express();
     app.use(morgan('dev'));
     app.use(require('./routers'));
+    app.use('/developers', require('./routers/developers'));
+
     app.use(bodyParser.json());
     app.use(cors());
 

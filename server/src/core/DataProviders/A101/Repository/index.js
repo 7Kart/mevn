@@ -2,17 +2,15 @@ const A101Parser = require("../Source/A101Parser");
 
 //get parallel all A101 flats
 exports.getAsyncAllFlats = function () {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         let queryParams = null;
-        try
-        {
+        try {
             queryParams = await A101Parser.getFilterParams()
-        }    
-        catch(err)
-        {
+        }
+        catch (err) {
             reject(err)
-        }      
-        const skipCount = 100;    
+        }
+        const skipCount = 100;
         if (queryParams) {
             let totalFlatsCount = queryParams.count;
             let offset = 0;
@@ -32,18 +30,18 @@ exports.getAsyncAllFlats = function () {
                 flats.forEach((flat) => {
                     var flatId = flat.map((item) => {
                         return item.idOrigin;
-                    })                    
+                    })
                     allFlats.push(...flat)
                 });
             });
             resolve(allFlats)
-        }        
+        }
     })
 }
 
 exports.getAllFlats = function () {
-    return new Promise(async(resolve, reject) => {
-        const skipCount = 20;        
+    return new Promise(async (resolve, reject) => {
+        const skipCount = 20;
         let queryParams = await A101Parser.getFilterParams();
 
         if (queryParams) {
@@ -66,7 +64,18 @@ exports.getAllFlats = function () {
                 allFlats.push(...flats);
             }
             resolve(allFlats);
-        }        
+        }
     })
 }
 
+exports.getFilterParams = function (query) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const queryParams = await A101Parser.getFilterParams(query)
+            resolve(queryParams);
+        }
+        catch (err) {
+            reject(err)
+        }
+    });
+}
