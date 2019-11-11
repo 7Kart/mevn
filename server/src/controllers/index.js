@@ -8,6 +8,16 @@ exports.GetA101Flats = function (req, res) {
     // });
 }
 
+exports.getNewDevelopersProjects = function (req, res) {
+    A101Repository.getNewDevelopersProject()
+        .then((developerData) => {
+            res.send(developerData.facets.complexNames);
+        })
+        .catch(err => {
+            res.send(err)
+        })
+}
+
 
 //moove to A101.js
 exports.ParceAllA101Flats = function (req, res) {

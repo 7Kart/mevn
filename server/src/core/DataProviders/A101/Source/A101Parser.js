@@ -128,11 +128,19 @@ function getFilterParams(query) {
                             data += chunk;
                         });
 
-                        resp.on('end', (req, res) => {
-                            console.log('req, res!!!', complexNameUrl);
-                            filterData.facets["complexNames"] = JSON.parse(data).complex ? JSON.parse(data).complex.split(", ") : JSON.parse(data).complex.split(", ")
+                        resp.on('end', (req, res) => {                          
+                            let complexes = JSON.parse(data).complex;                           
+                            filterData.facets["complexNames"] = [];
+                            if(complexes){
+                                complexes.split(", ").forEach((complexName, index) => {
+                                    filterData.facets["complexNames"].push({
+                                        id: filterData.facets.complex[index],
+                                        name: complexName
+                                    });
+                                })
+                            }  
                             resolve(filterData);
-                        })
+                        });
 
                         resp.on('error', (err) => {
                             resolve(filterData);
