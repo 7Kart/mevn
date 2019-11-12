@@ -8,7 +8,7 @@ exports.GetA101Flats = function (req, res) {
     // });
 }
 
-exports.getNewDevelopersProjects = function (req, res) {
+exports.getNewDevelopersProjects = function (req, res) {    
     A101Repository.getNewDevelopersProject()
         .then((developerData) => {
             res.send(developerData.facets.complexNames);

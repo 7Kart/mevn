@@ -1,28 +1,24 @@
 const A101Parser = require("../Source/A101Parser"),
     Developer = require("../../../../models/developer")
 
+// find new projects on site a101
 exports.getNewDevelopersProject = function () {
     return new Promise(async (resolve, reject) => {
         let a101DevelopersProject = null;
-        try{
+        try {
             a101DevelopersProject = await A101Parser.getFilterParams();
-            Developer.findOne({"name": "A101"}, (err, developers) => {
-                if(err) reject(err);
-                console.log('a101DevelopersProject', a101DevelopersProject.facets.complexNames);
-                
-                const newProject = a101DevelopersProject.facets.complexNames.filter(siteProject => {
-                    return !(developers.projects.find(project=>{}))
-                    // developers.projects.forEach(dbProject => {
-                    //     return !(siteProject.id == dbProject.id && siteProject.name == dbProject.name)
-                    // });
-                    // if()
+            Developer.findOne({ "name": "A101" }, (err, developers) => {
+                if (err) reject(err);
+                const newProjects = []
+                a101DevelopersProject.facets.complexNames.forEach((projectFromeSite) => {
+                    const existProject = developers.projects.find((dbProject) => {
+                        return dbProject.originId == projectFromeSite.id && dbProject.name == projectFromeSite.name
+                    });
+                    if (!existProject)
+                        newProjects.push(projectFromeSite)
                 });
-
-                console.log('test', newProject);
-
-                resolve(a101DevelopersProject);
-
-            })
+                resolve(newProjects);
+            });
         }
         catch (err) {
             reject(err)
