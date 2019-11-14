@@ -26,6 +26,18 @@ exports.getNewDevelopersProject = function () {
     });
 }
 
+
+exports.findNewFlats = function(){
+    //get from db all developers
+
+    //get every developers and loop all there projects
+
+    //get frome site query params (flats count)
+
+    //by limit get project flats find them in db and add them to it if there aren't
+
+}
+
 //get parallel all A101 flats
 exports.getAsyncAllFlats = function () {
     return new Promise(async (resolve, reject) => {

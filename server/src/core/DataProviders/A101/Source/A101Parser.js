@@ -12,6 +12,8 @@ function ParseDevelopersProjects(){
 
 }
 
+//this is api for proxy https://www.proxy-list.download/api/v1/get?type=http&country=RU
+
 //parse flats from list https://a101.ru/kvartiry/?group=0&complex=17
 function ParseFlatsList(query) {
     return new Promise((resolve, reject) => {
