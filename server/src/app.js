@@ -4,12 +4,14 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const config = require('config');
+const cron = require('../src/cron/shedule.js');
 
 mongoose.connect(config.get("app.dbConfig.connectionString"), { useNewUrlParser: true, dbName:"hives" });
 
 mongoose.connection.on("connected", () => {
     
     const app = express();
+    
     app.use(morgan('dev'));
     app.use(require('./routers'));
     app.use('/developers', require('./routers/developers'));
@@ -19,6 +21,7 @@ mongoose.connection.on("connected", () => {
 
     app.listen(process.env.PORT || config.get("app.port"), ()=>{
         console.log(`server start on port ${config.get("app.port")}`);
+        cron.initCronJobs();
     });
 })
 

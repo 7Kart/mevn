@@ -3,9 +3,26 @@ const Developer = require("../models/developer"),
     A101Repository = require("../core/DataProviders/A101/Repository");
 
 exports.GetA101Flats = function (req, res) {
-    // A101Parser.getRoomsData(req.query).then(flats => {
-    //     res.send(flats);
-    // });
+
+    A101Repository.findNewFlats().then((developer) => {
+        res.send({
+            result: developer
+        })
+    }).catch((err) => {
+        res.send({
+            error: err
+        })
+    })
+}
+
+exports.getNewDevelopersProjects = function (req, res) {
+    A101Repository.getNewDevelopersProject()
+        .then((developerData) => {
+            res.send(developerData.facets.complexNames);
+        })
+        .catch(err => {
+            res.send(err)
+        })
 }
 
 
@@ -29,6 +46,7 @@ exports.ParceAllA101FlatsAsync = function (req, res) {
 
 
 exports.getA101FilterParams = function (req, res) {
+
     A101Repository.getFilterParams(req.query).then(params => {
         res.send(params);
     }, function (err) {
