@@ -129,8 +129,9 @@ function getFilterParams(query) {
                         });
 
                         resp.on('end', (req, res) => {
-                            console.log('req, res!!!', complexNameUrl);
                             filterData.facets["complexNames"] = JSON.parse(data).complex ? JSON.parse(data).complex.split(", ") : JSON.parse(data).complex.split(", ")
+                            console.log('req, res!!!', complexNameUrl);
+                            
                             resolve(filterData);
                         })
 
