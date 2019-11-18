@@ -7,7 +7,6 @@ var DevelopersSchema = new Schema({
     roomsCount: Number,
     district: String,
     pavilion: String,
-    floors: Number,
     maxFloor: Number,
     area: String,
     dateFinished: Date,
@@ -15,8 +14,18 @@ var DevelopersSchema = new Schema({
     prisePerMeterStr: String,
     prisePerMeter: Number,
     oldCoastStr:String,
+    coastStr:String,
     oldCoast: Number,
-    coast: Number
+    coast: Number,
+    whitebox: Boolean,
+    mortgagershb: Boolean,
+    ignore: Boolean,
+    idOrigin: Number,
+    href: String,
+    fursnishing: Boolean,
+    floor: Number,
+    design: Boolean,
+    business: Boolean
 });
 
 
