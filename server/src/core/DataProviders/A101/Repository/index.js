@@ -1,5 +1,7 @@
+const mongoose = require('mongoose')
 const A101Parser = require("../Source/A101Parser"),
-    Developer = require("../../../../models/developer")
+    Developer = require("../../../../models/developer"),
+    Flat = require("../../../../models/flat")
 
 // filter params: 
 // complex,
@@ -61,23 +63,82 @@ exports.findNewFlats = async function () {
         const skipCount = 20;
         let queryParams = [];
         let offset = 0
-        while (offset < projectFlatCount) {
-            queryParams.push({
-                group: 0,
-                limit: skipCount,
-                offset: offset,
-                complex: project.originId
-            });
-            offset += skipCount;
-        }
+
+        // while (offset < projectFlatCount) {
+        //     queryParams.push({
+        //         group: 0,
+        //         limit: skipCount,
+        //         offset: offset,
+        //         complex: project.originId
+        //     });
+        //     offset += skipCount;
+        // }
+
+        ////////for test
+        queryParams.push({
+            group: 0,
+            limit: skipCount,
+            offset: offset,
+            complex: project.idOrigin
+        });
+        //////
+
+
         for (const param of queryParams) {
             let flats = null;
             try {
+                //get all flats frome site    
                 flats = await A101Parser.getRoomsData(param);
+
+                // //add new flats to db
+                // Flat.collection.insert(flats, function (err, flat) {
+                //     if (err) {
+                //         throw err;
+                //     } else {
+                //         console.log(`new dbs added`);
+                //     }
+                // });
+
+
+
+                Flat.find({}, { _id: 1, instock: { $slice: -1 } }, (err, flatsId) => {
+                    // Developer.findOne({ '_id': mongoose.Types.ObjectId('5dd13c9c1c9d44000002ebb0')  }, (err, developer) => {
+                    //     console.log(`developer ${developer}`);
+                    // });
+                    const toSave = flatsId.map((flat) => flat._id)
+
+                    console.log(`toSave`, toSave);
+
+                    Developer.findOneAndUpdate({
+                        '_id': mongoose.Types.ObjectId('5dd13c9c1c9d44000002ebb0'),
+                        'projects.name': 'Скандинавия'
+                    }, {
+                        $push: { "projects.$.flatIds": { $each: toSave } }
+                    }, (err, update) => {
+                        console.log(`err ${err}`);
+                        console.log(`update ${update}`);
+                    });
+
+                });
+
+
+                // const flatIds = flats.map((flat)=>{
+                //     return flat.idOrigin;
+                // });
+
+                //serching flats in db
+                // let dbFlats = [];
+                // try{
+                //     dbFlats = await Developer.find({"idOrigin":{$in : flatIds}})
+                // }
+                // catch(e)
+                // {
+                //     throw e;
+                // }
             } catch (e) {
                 throw e;
             }
-            
+
         }
     }
     return dbProjects;
