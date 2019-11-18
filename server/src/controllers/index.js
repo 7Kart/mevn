@@ -7,6 +7,8 @@ exports.GetA101Flats = function (req, res) {
     A101Repository.test().then(flats => {
         res.send(flats);
     }).catch(err => {
+        console.log(`err ${err}`);
+        
         res.send({
             status: 500
         })

@@ -1,6 +1,7 @@
 const needle = require('needle'),
     cheerio = require("cheerio"),
     https = require('https'),
+    Flat = require("../../DataModel/Flat"),
     urlUtils = require('../../../urlUtils');
 
 const BASE_URL = "https://a101.ru"
@@ -36,15 +37,14 @@ function ParseFlatsList(query) {
                     normalizeWhitespace: true,
                 });
             }
-            catch (e) {
-                
+            catch (e) {                
                 reject(e)
             }
 
             const linksListDom = $('.js-flat-list-new-table-item');
 
             linksListDom.each((ind, divRoom) => {
-                let flat = {};
+                let flat = new Flat();
                 const linkDom = $(divRoom).children('a')[0];
                 flat.href = linkDom.attribs.href;
                 if (flat.href) {
