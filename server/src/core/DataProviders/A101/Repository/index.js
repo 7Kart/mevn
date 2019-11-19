@@ -1,8 +1,8 @@
 const mongoose = require('mongoose')
 const A101Parser = require("../Source/A101Parser"),
     Developer = require("../../../../models/developer"),
-    Flat = require("../../../../models/flat"),
-    FlatWeb = require("../../DataModel/Flat");
+    Flat = require("../../../../models/flat");
+
 
 // filter params: 
 // complex,
@@ -78,22 +78,21 @@ exports.test = async function () {
         } catch (e) {
             throw new Error('error until get flats from db')
         }
-    
 
-        for (let flat of flats) {
-            let dbFlat;
-            try {
-                dbFlat = await Flat.findOne({ idOrigin: flat.idOrigin });
-                if (dbFlat){
-                    const dif = flat.compareWithDbEntity(dbFlat);
-                    console.log(`here ${dif}`);
-                }else{
-                    console.log(`not found`);
-                }
-            } catch (e) {
-                throw e;
-            }
+        const flatsIds = flats.map(flat => flat.idOrigin)
+        let dbFlats;
+        try {
+            dbFlats = await Flat.find({ "idOrigin": { $in: flatsIds } })
+        } catch (e) {
+            throw e;
         }
+
+        for (let dbFlat of dbFlats) {
+            const flat = flats.find(flat => flat.idOrigin == dbFlat.idOrigin)
+            const difference = flat.compareWithDbEntity(dbFlat)
+            console.log('test');
+        }
+        // const dif = flat.compareWithDbEntity(dbFlat);
 
     }
 

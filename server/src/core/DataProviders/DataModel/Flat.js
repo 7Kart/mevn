@@ -28,15 +28,16 @@ module.exports = class Flat {
 
     compareWithDbEntity(dbFlat) {
         var difference = {};
-        for (let [key, flat] in this) {
+        for (let key in this) {            
             if (this.hasOwnProperty(key)) {
-                if (flat instanceof Date) {
-                    if (flat.getTime() != dbFlat[key].getTime()) {
+                if (this[key] instanceof Date) {
+                    if (this[key].getTime() != dbFlat[key].getTime()) {
                         difference[key] = dbFlat[key];
                     }
                 } else {
-                    if (flat != dbFlat[key]) {
+                    if (this[key] != dbFlat[key]) {
                         difference[key] = dbFlat[key];
+                        console.log('FIND!!!' );
                     }
                 }
             }
