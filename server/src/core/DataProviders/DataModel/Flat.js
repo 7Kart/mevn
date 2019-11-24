@@ -26,9 +26,13 @@ module.exports = class Flat {
         this.business = null;
     }
 
+    //сравнивает все поля с полями в базе и возвращает поля значения 
     compareWithDbEntity(dbFlat) {
-        var difference = {};
-        for (let key in this) {            
+        var difference = {
+            new: {},
+            old: {}
+        };
+        for (let key in this) {
             if (this.hasOwnProperty(key)) {
                 if (this[key] instanceof Date) {
                     if (this[key].getTime() != dbFlat[key].getTime()) {
@@ -36,8 +40,8 @@ module.exports = class Flat {
                     }
                 } else {
                     if (this[key] != dbFlat[key]) {
-                        difference[key] = dbFlat[key];
-                        console.log('FIND!!!' );
+                        difference.new[key] = this[key];
+                        difference.old[key] = dbFlat[key];                        
                     }
                 }
             }

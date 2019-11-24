@@ -25,7 +25,8 @@ var DevelopersSchema = new Schema({
     fursnishing: Boolean,
     floor: Number,
     design: Boolean,
-    business: Boolean
+    business: Boolean,
+    changes: [Object]
 });
 
 

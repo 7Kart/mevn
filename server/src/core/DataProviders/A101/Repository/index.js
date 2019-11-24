@@ -55,7 +55,7 @@ exports.test = async function () {
 
     let projectFilters = null;
     try {
-        projectFilters = await getFilterParams({ complex: project.originId });
+        projectFilters = await getFilterParams({ complex: project.idOrigin });
     } catch (err) {
         throw new Error('get site filter error');
     }
@@ -67,145 +67,136 @@ exports.test = async function () {
     queryParams.push({
         group: 0,
         limit: 20,
-        offset: 0,
-        complex: project.originId
+        offset: 40,
+        complex: project.idOrigin
     });
 
     let flats = null
-    for (const param in queryParams) {
+    for (const param of queryParams) {
         try {
             flats = await A101Parser.getRoomsData(param);
         } catch (e) {
             throw new Error('error until get flats from db')
         }
 
-        const flatsIds = flats.map(flat => flat.idOrigin)
-        let dbFlats;
-        try {
-            dbFlats = await Flat.find({ "idOrigin": { $in: flatsIds } })
-        } catch (e) {
-            throw e;
+        for (let flat of flats) {
+            let dbFlat;
+            try {
+                dbFlat = await Flat.findOne({ "idOrigin": flat.idOrigin })
+            } catch (e) {
+                throw e;
+            }
+            if (dbFlat) {
+                //if object is empty
+                console.log('find in db');
+                const changes = flat.compareWithDbEntity(dbFlat)
+                if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
+                    for (key in changes.new) {
+                        dbFlat[key] = changes.new[key]
+                    }
+                    changes.old['dtChanges'] = new Date();
+                    dbFlat.changes.push(changes.old);
+                    try {
+                        await dbFlat.save();
+                    } catch (e) {
+                        throw e;
+                    }
+                }
+            } else {
+                //if there is changes
+                console.log('new db flat');
+                const newDbFlat = new Flat(flat);
+                try {
+                    newDbFlat.save();
+                } catch (e) {
+                    throw e;
+                }
+            }
         }
-
-        for (let dbFlat of dbFlats) {
-            const flat = flats.find(flat => flat.idOrigin == dbFlat.idOrigin)
-            const difference = flat.compareWithDbEntity(dbFlat)
-            console.log('test');
-        }
-        // const dif = flat.compareWithDbEntity(dbFlat);
-
     }
-
-    // toSave = dbFlats.map(flat => mongoose.Types.ObjectId(flat._id));
-    // console.log(`toSave ${toSave}`);
-
-    // Developer.findOneAndUpdate({
-    //     'projects.idOrigin': project.idOrigin
-    // }, {
-    //     $push: { "projects.$.flatIds": { $each: toSave } }
-    // }, (err, update) => {
-    //     console.log(`err ${err}`);
-    //     console.log(`update ${update}`);
-    // });
-
-
     return [];
 }
 
 exports.findNewFlats = async function () {
-    //get from db all developers
-    let dbProjects = null;
+    let dbDeveloper = null;
     try {
-        dbProjects = await Developer.findOne({ "name": "A101" }, { "projects": true })
+        dbDeveloper = await Developer.findOne({ "name": "A101" }, { "projects": true })
     }
     catch (err) {
         throw new Error('get db project error');
     }
-    for (const project of dbProjects.projects) {
+
+    for (project of dbDeveloper.projects) {
         let projectFilters = null;
         try {
-            projectFilters = await getFilterParams({ complex: project.originId });
+            projectFilters = await getFilterParams({ complex: project.idOrigin });
         } catch (err) {
             throw new Error('get site filter error');
         }
+
         const projectFlatCount = projectFilters.count;
-
-        const skipCount = 20;
-        let offset = 0
-
+        const limit = 20;
+        let offset = 0;
         let queryParams = [];
 
         while (offset < projectFlatCount) {
             queryParams.push({
                 group: 0,
-                limit: skipCount,
+                limit: limit,
                 offset: offset,
-                complex: project.originId
+                complex: project.idOrigin
             });
-            offset += skipCount;
+            offset += limit;
         }
+
         for (const param of queryParams) {
-            let flats = null;
+            let flats = null
+
             try {
-                //get all flats frome site    
                 flats = await A101Parser.getRoomsData(param);
-
-                // //add new flats to db
-                // Flat.collection.insert(flats, function (err, flat) {
-                //     if (err) {
-                //         throw err;
-                //     } else {
-                //         console.log(`new dbs added`);
-                //     }
-                // });
-
-                Flat.find({}, { _id: 1, instock: { $slice: -1 } }, (err, flatsId) => {
-                    // Developer.findOne({ '_id': mongoose.Types.ObjectId('5dd13c9c1c9d44000002ebb0')  }, (err, developer) => {
-                    //     console.log(`developer ${developer}`);
-                    // });
-                    const toSave = flatsId.map((flat) => flat._id)
-
-                    console.log(`toSave`, toSave);
-
-                    Developer.findOneAndUpdate({
-                        '_id': mongoose.Types.ObjectId('5dd13c9c1c9d44000002ebb0'),
-                        'projects.name': 'Скандинавия'
-                    }, {
-                        $push: { "projects.$.flatIds": { $each: toSave } }
-                    }, (err, update) => {
-                        console.log(`err ${err}`);
-                        console.log(`update ${update}`);
-                    });
-
-                });
-
-
-                // const flatIds = flats.map((flat)=>{
-                //     return flat.idOrigin;
-                // });
-
-                //serching flats in db
-                // let dbFlats = [];
-                // try{
-                //     dbFlats = await Developer.find({"idOrigin":{$in : flatIds}})
-                // }
-                // catch(e)
-                // {
-                //     throw e;
-                // }
             } catch (e) {
-                throw e;
+                throw new Error('error until get flats from website')
+            }
+
+            for (let flat of flats) {
+                let dbFlat;
+                try {
+                    dbFlat = await Flat.findOne({ "idOrigin": flat.idOrigin });
+                } catch (e) {
+                    throw e;
+                }
+                if (dbFlat) {
+                    //if object is empty
+                    console.log('find in db');
+                    const changes = flat.compareWithDbEntity(dbFlat)
+                    if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
+                        for (key in changes.new) {
+                            dbFlat[key] = changes.new[key]
+                        }
+                        changes.old['dtChanges'] = new Date();
+                        dbFlat.changes.push(changes.old);
+                        try {
+                            await dbFlat.save();
+                        } catch (e) {
+                            throw e;
+                        }
+                    }
+                } else {
+                    //if there is changes
+                    console.log('new db flat');
+                    const newDbFlat = new Flat(flat);
+                    try {
+                        newDbFlat.save();
+                    } catch (e) {
+                        throw e;
+                    }
+                }
             }
 
         }
     }
-    return dbProjects;
 
-    //get every developers and loop all there projects
-
-    //get frome site query params (flats count)
-
-    //by limit get project flats find them in db and add them to it if there aren't
+    return [];
 
 }
 

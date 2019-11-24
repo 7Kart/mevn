@@ -3,8 +3,7 @@ const Developer = require("../models/developer"),
     A101Repository = require("../core/DataProviders/A101/Repository");
 
 exports.GetA101Flats = function (req, res) {
-
-    A101Repository.test().then(flats => {
+    A101Repository.findNewFlats().then(flats => {
         res.send(flats);
     }).catch(err => {
         console.log(`err ${err}`);
