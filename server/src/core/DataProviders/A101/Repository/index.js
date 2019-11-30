@@ -42,89 +42,25 @@ exports.getNewDevelopersProject = function () {
     });
 }
 
-exports.test = async function () {
-    let dbProjects = null;
-    try {
-        dbProjects = await Developer.findOne({ "name": "A101" }, { "projects": true })
-    }
-    catch (err) {
-        throw new Error('get db project error');
-    }
 
-    const project = dbProjects.projects[0];
-
-    let projectFilters = null;
-    try {
-        projectFilters = await getFilterParams({ complex: project.idOrigin });
-    } catch (err) {
-        throw new Error('get site filter error');
-    }
-
-    const projectFlatCount = projectFilters.count;
-
-    let queryParams = [];
-
-    queryParams.push({
-        group: 0,
-        limit: 20,
-        offset: 40,
-        complex: project.idOrigin
-    });
-
-    let flats = null
-    for (const param of queryParams) {
-        try {
-            flats = await A101Parser.getRoomsData(param);
-        } catch (e) {
-            throw new Error('error until get flats from db')
-        }
-
-        for (let flat of flats) {
-            let dbFlat;
-            try {
-                dbFlat = await Flat.findOne({ "idOrigin": flat.idOrigin })
-            } catch (e) {
-                throw e;
-            }
-            if (dbFlat) {
-                //if object is empty
-                console.log('find in db');
-                const changes = flat.compareWithDbEntity(dbFlat)
-                if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
-                    for (key in changes.new) {
-                        dbFlat[key] = changes.new[key]
-                    }
-                    changes.old['dtChanges'] = new Date();
-                    dbFlat.changes.push(changes.old);
-                    try {
-                        await dbFlat.save();
-                    } catch (e) {
-                        throw e;
-                    }
-                }
-            } else {
-                //if there is changes
-                console.log('new db flat');
-                const newDbFlat = new Flat(flat);
-                try {
-                    newDbFlat.save();
-                } catch (e) {
-                    throw e;
-                }
-            }
-        }
-    }
-    return [];
-}
-
+//get all A101's flats by offset chunk
 exports.findNewFlats = async function () {
     let dbDeveloper = null;
+
     try {
         dbDeveloper = await Developer.findOne({ "name": "A101" }, { "projects": true })
     }
     catch (err) {
         throw new Error('get db project error');
     }
+
+    const requestDate = new Date();
+
+    let stats = {
+        update: 0,
+        add: 0,
+        date: requestDate
+    };
 
     for (project of dbDeveloper.projects) {
         let projectFilters = null;
@@ -139,17 +75,18 @@ exports.findNewFlats = async function () {
         let offset = 0;
         let queryParams = [];
 
-        while (offset < projectFlatCount) {
+        // while (offset < projectFlatCount) {
+        for (offset; offset <= projectFlatCount; offset += limit) {
             queryParams.push({
                 group: 0,
                 limit: limit,
                 offset: offset,
                 complex: project.idOrigin
             });
-            offset += limit;
         }
 
         for (const param of queryParams) {
+
             let flats = null
 
             try {
@@ -158,7 +95,11 @@ exports.findNewFlats = async function () {
                 throw new Error('error until get flats from website')
             }
 
+            var newFlatArray = [];
+            var editDbPromises = [];
+
             for (let flat of flats) {
+                console.log('flat', param.offset);
                 let dbFlat;
                 try {
                     dbFlat = await Flat.findOne({ "idOrigin": flat.idOrigin });
@@ -166,38 +107,40 @@ exports.findNewFlats = async function () {
                     throw e;
                 }
                 if (dbFlat) {
-                    //if object is empty
-                    console.log('find in db');
+                    //if object is empty                    
                     const changes = flat.compareWithDbEntity(dbFlat)
                     if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
                         for (key in changes.new) {
                             dbFlat[key] = changes.new[key]
                         }
-                        changes.old['dtChanges'] = new Date();
+                        changes.old['dtChanges'] = requestDate; //date of request start.   
                         dbFlat.changes.push(changes.old);
-                        try {
-                            await dbFlat.save();
-                        } catch (e) {
-                            throw e;
-                        }
+                        editDbPromises.push(dbFlat.save());
                     }
                 } else {
-                    //if there is changes
-                    console.log('new db flat');
-                    const newDbFlat = new Flat(flat);
-                    try {
-                        newDbFlat.save();
-                    } catch (e) {
-                        throw e;
-                    }
+                    //if there is changes    
+                    flat.dateInsert = requestDate;   //date of request start.              
+                    newFlatArray.push(new Flat(flat));
                 }
             }
 
+            if (newFlatArray.length > 0) {
+                editDbPromises.push(Flat.insertMany(newFlatArray));
+            }
+
+            await Promise.all(editDbPromises).then((changes) => {
+                changes.forEach(change => {
+                    if (Array.isArray(change)) {
+                        stats.add = change.length
+                    } else {
+                        stats.update += 1;
+                    }
+                });
+                console.log('changes', stats);
+            });
         }
     }
-
-    return [];
-
+    return stats;
 }
 
 //get parallel all A101 flats

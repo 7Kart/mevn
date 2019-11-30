@@ -4,27 +4,17 @@ const Developer = require("../models/developer"),
 
 exports.GetA101Flats = function (req, res) {
     A101Repository.findNewFlats().then(flats => {
-        res.send(flats);
+        // res.send(flats);
     }).catch(err => {
         console.log(`err ${err}`);
         
         res.send({
             status: 500
         })
-    })
+    });
+    res.send('task run');
+
 }
-
-
-// A101Repository.findNewFlats().then((developer) => {
-//     res.send({
-//         result: developer
-//     })
-// }).catch((err) => {
-//     res.send({
-//         error: err
-//     })
-// })
-
 
 exports.getNewDevelopersProjects = function (req, res) {
     A101Repository.getNewDevelopersProject()

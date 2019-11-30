@@ -13,8 +13,8 @@ var DevelopersSchema = new Schema({
     dateFinishedStr: String,
     prisePerMeterStr: String,
     prisePerMeter: Number,
-    oldCoastStr:String,
-    coastStr:String,
+    oldCoastStr: String,
+    coastStr: String,
     oldCoast: Number,
     coast: Number,
     whitebox: Boolean,
@@ -26,7 +26,11 @@ var DevelopersSchema = new Schema({
     floor: Number,
     design: Boolean,
     business: Boolean,
-    changes: [Object]
+    changes: [Object],
+    dateInsert: {
+        type: Date,
+        default: Date.now
+    },
 });
 
 
