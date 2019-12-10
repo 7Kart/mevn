@@ -1,13 +1,14 @@
 const Developer = require("../models/developer"),
     Flat = require("../models/flat"),
-    A101Repository = require("../core/DataProviders/A101/Repository");
+    A101Repository = require("../core/DataProviders/A101/Repository"),
+    PickRepository = require("../core/DataProviders/Pick/Source/PickApiGetters");
 
 exports.GetA101Flats = function (req, res) {
     A101Repository.findNewFlats().then(flats => {
         // res.send(flats);
     }).catch(err => {
         console.log(`err ${err}`);
-        
+
         res.send({
             status: 500
         })
@@ -54,22 +55,34 @@ exports.getA101FilterParams = function (req, res) {
     });
 }
 
-exports.GetA101FlatsHistory = function (req, res) {
-    // Developer
-    //     .find()
-    //     .populate('projects.flatIds')
-    //     .exec((err, developers) => {
-    //         res.send({
-    //             data: developers
-    //         })
-    //     })
-}
-
-exports.GetFlats = function(req, res){
-    A101Repository.getFlatsByParams(req.query).then((result)=>{
+exports.GetFlats = function (req, res) {
+    A101Repository.getFlatsByParams(req.query).then((result) => {
         res.send(result);
     })
-    .catch((e)=>{
-        res.send(e);
-    })
+        .catch((e) => {
+            res.send(e);
+        })
+}
+
+//get all Pick's locations
+exports.GetPickLocation = (req, res) => {
+    PickRepository.getPickLocation()
+        .then((locations) => {
+            res.send(locations.body)
+        })
+        .catch((err) => {
+            res.send(err);
+        })
+}
+
+//get all show rooms
+exports.GetPickShowRoom = (req, res) => {
+    // console.log('req.query', req.query);
+    PickRepository.getPickShowRoom(req.query)
+        .then((showRooms) => {
+            res.send(showRooms.body);
+        })
+        .catch((err) => {
+            res.send(err);
+        })
 }

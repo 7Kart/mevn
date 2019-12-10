@@ -5,7 +5,7 @@ const CronJob = require('cron').CronJob,
 
 exports.initCronJobs = function () {
     console.log("job list is empty")
-    new CronJob('0 00-23/1 * * *', function () {        
+    new CronJob('0 00-23/3 * * *', function () {        
         Jobs.GetA101Flats();
     }, null, true, 'Europe/Moscow');
 }

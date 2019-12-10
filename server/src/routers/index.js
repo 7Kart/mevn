@@ -9,4 +9,9 @@ router.get('/getNewDevelopersProjects', homeCtr.getNewDevelopersProjects);
 router.get('/GetA101Flats', homeCtr.GetA101Flats);
 router.get('/GetFlats', homeCtr.GetFlats);
 
+// Pick developer
+router.get('/GetPickLocation', homeCtr.GetPickLocation);
+router.get('/GetPickShowRoom', homeCtr.GetPickShowRoom);
+
+
 module.exports = router;
