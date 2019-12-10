@@ -27,6 +27,10 @@ var DevelopersSchema = new Schema({
     design: Boolean,
     business: Boolean,
     changes: [Object],
+    block: {
+        type: Boolean,
+        default: false
+    },
     dateInsert: {
         type: Date,
         default: Date.now

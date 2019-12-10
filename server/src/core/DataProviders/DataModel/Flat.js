@@ -24,6 +24,7 @@ module.exports = class Flat {
         this.floor = null;
         this.design = null;
         this.business = null;
+        this.block = false;
     }
 
     //сравнивает все поля с полями в базе и возвращает поля значения 

@@ -1,11 +1,13 @@
-const CronJob = require('cron').CronJob;
-const Jobs =  require('./jobs'); 
+const CronJob = require('cron').CronJob,
+    Jobs = require('./jobs')
 
-exports.initCronJobs = function(){
+
+
+exports.initCronJobs = function () {
     console.log("job list is empty")
-    Jobs.GetNewDevelopersProjects();
-    // return new CronJob('* * * * * *', function () {
-    //     console.log('You will see this message every second');
-    // }, null, true, 'America/Los_Angeles');
+    new CronJob('0 00-23/1 * * *', function () {        
+        Jobs.GetA101Flats();
+    }, null, true, 'Europe/Moscow');
 }
 
+// 0 00-23/3 * * *

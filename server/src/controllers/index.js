@@ -26,7 +26,6 @@ exports.getNewDevelopersProjects = function (req, res) {
         })
 }
 
-
 //moove to A101.js
 exports.ParceAllA101Flats = function (req, res) {
     A101Repository.getAllFlats()
@@ -66,4 +65,11 @@ exports.GetA101FlatsHistory = function (req, res) {
     //     })
 }
 
-
+exports.GetFlats = function(req, res){
+    A101Repository.getFlatsByParams(req.query).then((result)=>{
+        res.send(result);
+    })
+    .catch((e)=>{
+        res.send(e);
+    })
+}

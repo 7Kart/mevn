@@ -42,6 +42,9 @@ exports.getNewDevelopersProject = function () {
     });
 }
 
+exports.getFlatsByParams = function(queryParams){
+    return A101Parser.getRoomsData(queryParams);
+}
 
 //get all A101's flats by offset chunk
 exports.findNewFlats = async function () {

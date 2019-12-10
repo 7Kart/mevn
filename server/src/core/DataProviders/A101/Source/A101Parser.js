@@ -9,10 +9,6 @@ const BASE_URL = "https://a101.ru"
 exports.getRoomsData = ParseFlatsList;
 exports.getFilterParams = getFilterParams;
 
-function ParseDevelopersProjects(){
-
-}
-
 //parse flats from list https://a101.ru/kvartiry/?group=0&complex=17
 function ParseFlatsList(query) {
     return new Promise((resolve, reject) => {
@@ -50,7 +46,7 @@ function ParseFlatsList(query) {
                 if (flat.href) {
                     flat.idOrigin = getNumbers(flat.href);
                 }
-                let linksDivsInfo = $(linkDom).children();
+                let linksDivsInfo = $(linkDom).children();             
 
                 linksDivsInfo.each((ind, divDom) => {
                     if (ind == 0) {
@@ -87,6 +83,7 @@ function ParseFlatsList(query) {
                     }
                 });
 
+                //features such as "mortgage-rshb", "business", "ignore", "design", "whitebox", "fursnishing"
                 DomClassName.feature.forEach(className => {
                     let featureDiv = $(divRoom).find(`.${className}`);
                     if (featureDiv.length > 0) {
@@ -95,6 +92,11 @@ function ParseFlatsList(query) {
                         flat[className.replace('-', '')] = false;
                     }
                 });
+
+                let blockEl = $(divRoom).find(`.flat-card__status`);
+                //reservation flat 
+                flat.block = blockEl.length > 0;
+                
                 flats.push(flat);
             });
             return resolve(flats);
