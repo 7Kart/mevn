@@ -8,5 +8,6 @@ exports.getPickLocation = () => {
 
 exports.getPickShowRoom = (queryParams) => {
     console.log('query', queryParams);
+    
     return needle('get', 'https://api.pik.ru/v1/showroom', queryParams, { json: true });
 }
