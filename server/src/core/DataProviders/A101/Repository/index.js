@@ -196,7 +196,7 @@ exports.getAllFlats = function () {
             var allFlats = [];
             var params = [];
 
-            while (offset < totalFlatsCount) {
+            while (offset < totalFlatsCo  unt) {
                 params.push({
                     group: 0,
                     limit: skipCount,

@@ -1,17 +1,21 @@
-const homeCtr = require('../controllers');
-const express = require('express');
-const router = express.Router();
+const express = require('express'),
+    router = express.Router(),
+    a101Ctr = require('../controllers/A101ctr'),
+    pickCtr = require('../controllers/pickCtr')
 
-
-router.get('/ParceAllA101Flats', homeCtr.ParceAllA101Flats);
-router.get('/ParceAllA101FlatsAsync', homeCtr.ParceAllA101FlatsAsync);
-router.get('/getNewDevelopersProjects', homeCtr.getNewDevelopersProjects);
-router.get('/GetA101Flats', homeCtr.GetA101Flats);
-router.get('/GetFlats', homeCtr.GetFlats);
+//A101
+router.get('/GetA101Flats', a101Ctr.GetA101Flats);
+router.get('/ParceAllA101Flats', a101Ctr.ParceAllA101Flats);
+router.get('/ParceAllA101FlatsAsync', a101Ctr.ParceAllA101FlatsAsync);
+router.get('/getNewDevelopersProjects', a101Ctr.getNewDevelopersProjects);
+router.get('/GetFlats', a101Ctr.GetFlats);
 
 // Pick developer
-router.get('/GetPickLocation', homeCtr.GetPickLocation);
-router.get('/GetPickShowRoom', homeCtr.GetPickShowRoom);
-
+router.get('/GetPickLocation', pickCtr.GetPickLocation);
+router.get('/GetPickShowRoom', pickCtr.GetPickShowRoom);
+router.get('/GetPickFlats', pickCtr.GetPickFlats);
+router.get('/GetPickBlocks', pickCtr.GetPickBlocks);
+router.get('/GetPickBulks', pickCtr.GetPickBulks);
+router.get('/GetPickChanges', pickCtr.GetPickChanges);
 
 module.exports = router;

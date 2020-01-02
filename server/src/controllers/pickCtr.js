@@ -1,0 +1,66 @@
+const PickAPI = require("../core/DataProviders/Pick/Source/PickApiGetters"),
+    pickRepository = require("../core/DataProviders/Pick/Repository/index");
+
+//get all Pick's locations
+exports.GetPickLocation = (req, res) => {
+    PickAPI.getPickLocation()
+        .then((locations) => {
+            res.send(locations.body)
+        })
+        .catch((err) => {
+            res.send(err);
+        })
+}
+
+//get all showRooms
+exports.GetPickShowRoom = (req, res) => {
+    PickAPI.getPickShowRoom(req.query)
+        .then((showRooms) => {
+            res.send(showRooms.body);
+        })
+        .catch((err) => {
+            res.send(err);
+        })
+}
+
+//GET ALL PIKC ROOMS 
+exports.GetPickFlats = (req, res) => {
+    PickAPI.getPickFlats(req.query)
+        .then((flats) => {
+            res.send(flats.body);
+        })
+        .catch((err) => {
+            res.send(err);
+        });
+}
+
+//GET PICK BLOCKS
+exports.GetPickBlocks = (req, res) => {
+    PickAPI.getPickBlocks(req.query)
+        .then((bloks) => {
+            res.send(bloks.body);
+        })
+        .catch((err) => {
+            res.send(err);
+        });
+}
+
+//GET PICK BULKS
+exports.GetPickBulks = (req, res) => {
+    PickAPI.getPickBulks(req.query)
+        .then((bloks) => {
+            res.send(bloks.body);
+        })
+        .catch((err) => {
+            res.send(err);
+        });
+}
+
+exports.GetPickChanges = (req, res) => {
+   
+    pickRepository.getPickChanges()
+    
+    res.send({
+        status: 200
+    })
+}
