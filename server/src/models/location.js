@@ -1,14 +1,15 @@
 const mongoose = require("mongoose");
 
-var Scheme = mongoose.Schema;
+var Schema = mongoose.Schema;
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 
-const LocationSchema = new Scheme({
-    _id: Schema.Types.ObjectId,
+const LocationSchema = new Schema({
+    _id: ObjectId,
     name: String,
+    code: String,
     DeveloperLocationIds:[{
-        developerId: ObjectId,
+        developerId: {type: ObjectId, ref: 'developers'},
         id: String
     }]
 })

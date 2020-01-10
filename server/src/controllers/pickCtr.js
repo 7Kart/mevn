@@ -57,10 +57,23 @@ exports.GetPickBulks = (req, res) => {
 }
 
 exports.GetPickChanges = (req, res) => {
-   
-    pickRepository.getPickChanges()
-    
-    res.send({
-        status: 200
-    })
+    pickRepository.getPickChanges().then(data => {
+        res.send({
+            data: data,
+            status: 200
+        });
+    });
+}
+
+exports.GetNewPickProjects = (req, res) => {
+    pickRepository.findNewProjects()
+        .then(data => {
+            res.send({
+                status: 200,
+                data: data
+            });
+        })
+        .catch((err) => {
+            res.send({ error: err })
+        })
 }
