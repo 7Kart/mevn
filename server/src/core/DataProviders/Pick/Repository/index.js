@@ -58,15 +58,17 @@ exports.findNewProjects = async () => {
                             }) == null) {                                   
                                 newBdProjects.push({
                                     name: webProject.name,
-                                    idOrigin: webProject.id,
-                                    flatIds: undefined,
+                                    idOrigin: webProject.id,                           
                                     locationId: dbProjects[0].locationId._id,
                                 });                                
                             } 
                         });
-                        developer.projects.push(...newBdProjects);   
-                        developer.save()
-                        console.log('developer', developer);
+
+                        console.log('newBdProjects', newBdProjects)
+
+                        // developer.projects.push(...newBdProjects);
+                        // developer.save();
+                        // console.log('developer', developer);
                     })
                     .catch(err => {
                         throw err;

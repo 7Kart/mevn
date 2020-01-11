@@ -9,7 +9,7 @@ var DevelopersSchema = new Schema({
         idOrigin: Number,
         name: String,
         locationId: { type: Schema.Types.ObjectId, ref: 'locations'},
-        flatIds: [{ type: Schema.Types.ObjectId, ref: 'flats' }],        
+        // flatIds: [{ type: Schema.Types.ObjectId, ref: 'flats'}],        
     }]
 });
 
