@@ -1,3 +1,5 @@
+const A101Repository = require("../core/DataProviders/A101/Repository")
+
 exports.getA101FilterParams = function (req, res) {
 
     A101Repository.getFilterParams(req.query).then(params => {

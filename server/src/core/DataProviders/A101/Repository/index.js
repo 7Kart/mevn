@@ -123,6 +123,9 @@ exports.findNewFlats = async function () {
                 } else {
                     //if there is changes    
                     flat.dateInsert = requestDate;   //date of request start.              
+                    console.log('project',project);
+                    flat.projectId = project._id;
+                    console.log('flat',flat);
                     newFlatArray.push(new Flat(flat));
                 }
             }

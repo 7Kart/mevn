@@ -47,7 +47,6 @@ module.exports = class Flat {
                 }
             }
         }
-
         return difference;
     }
 };

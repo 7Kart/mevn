@@ -27,6 +27,7 @@ var DevelopersSchema = new Schema({
     floor: Number,
     design: Boolean,
     business: Boolean,
+    projectId: Schema.Types.ObjectId,
     changes: [Object],
     block: {
         type: Boolean,
