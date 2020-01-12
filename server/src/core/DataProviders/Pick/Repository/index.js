@@ -66,8 +66,8 @@ exports.findNewProjects = async () => {
 
                         console.log('newBdProjects', newBdProjects)
 
-                        // developer.projects.push(...newBdProjects);
-                        // developer.save();
+                        developer.projects.push(...newBdProjects);
+                        developer.save();
                         // console.log('developer', developer);
                     })
                     .catch(err => {
