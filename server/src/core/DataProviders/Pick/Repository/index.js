@@ -1,7 +1,8 @@
 const pickAPI = require('../Source/PickApiGetters'),
     Developer = require("../../../../models/developer"),
     Flat = require("../../../../models/flat"),
-    Location = require("../../../../models/location");
+    mongoose = require("mongoose");
+Location = require("../../../../models/location");
 
 
 exports.getPickChanges = async () => {
@@ -30,54 +31,92 @@ exports.getPickChanges = async () => {
 //find new pick projects in MSC
 exports.findNewProjects = async () => {
 
-    return Developer.findOne({ name: "ПИК" }, { projects: 1 }).populate({
-        path: "projects.locationId",
-        model: "locations",
-        match: location => ({
-            code: "MSC"
-        })
-    }).exec((err, developer) => {
-        if (err) throw err;
-        if (developer) {
+    let location = null;
 
-            dbProjects = developer.projects.filter((project) => {
-                return project.locationId.code == "MSC"
-            });
+    try {
+        location = await Location.findOne({ code: "MSC" }, {});
+        if (location) {
+            let developer = null;
+            try {
+                developer = await Developer.findAndFilterProjects("ПИК", location._id);
 
-            location = dbProjects[0].locationId.DeveloperLocationIds.find(devLocation => {
-                return devLocation.developerId.toString() == developer._id.toString()
-            });
+                if (developer && developer[0]) {
+                    let originLocationId = location.DeveloperLocationIds.find((devLoc) => {
+                        return devLoc.developerId.toString() == developer[0]._id.toString();
+                    });
 
-            if (location) {
-                pickAPI.getPickBlocks({ locations: location.id })
-                    .then(webProjects => {
-                        let newBdProjects = []                        
-                        webProjects.body.forEach(webProject => {                            
-                            if (dbProjects.find(dbProject => {
-                                return dbProject.idOrigin == webProject.id
-                            }) == null) {                                   
-                                newBdProjects.push({
-                                    name: webProject.name,
-                                    idOrigin: webProject.id,                           
-                                    locationId: dbProjects[0].locationId._id,
-                                });                                
-                            } 
+                    let webPickProjects = null;
+
+                    try {
+                        webPickProjects = await pickAPI.getPickBlocks({ locations: originLocationId })
+                        newProjects = [];
+
+                        webPickProjects.body.forEach((pickProject) => {
+                            let projectInDb = developer[0].projects.find((dbProject) => {
+                                return dbProject.idOrigin == pickProject.id && dbProject.name == pickProject.name
+                            })
+
+                            if (!projectInDb) {
+                                newProjects.push({
+                                    _id: mongoose.Types.ObjectId(),
+                                    name: pickProject.name,
+                                    locationId: location._id,
+                                    idOrigin: pickProject.id
+                                });
+                            }
                         });
-
-                        console.log('newBdProjects', newBdProjects)
-
-                        developer.projects.push(...newBdProjects);
-                        developer.save();
-                        // console.log('developer', developer);
-                    })
-                    .catch(err => {
-                        throw err;
-                    })
-            } else {
-                throw new Error("there is no location");
+                        console.log('here');
+                        let update = null;
+                        try {
+                            update = await Developer.addNewProjects(developer[0]._id, newProjects);
+                        } catch (e) {
+                            throw e;
+                        }
+                        return update;
+                    } catch (e) {
+                        throw e;
+                    }
+                } else {
+                    throw new Error("developer is not found")
+                }
+            } catch (e) {
+                throw e;
             }
         } else {
-            throw new Error("there is no project");
+            throw new Error("location is not found")
         }
-    })
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+exports.getNewPickFlats = async () => {
+    console.log('init find new flats');
+    let developer = null;
+    try {
+        developer = await Developer.findOne({ name: "ПИК" },{})
+
+        if (developer) {
+            // console.log('developer', developer);
+            // for(let dbProject of developer.projects){
+                let dbProject = developer.projects[2]
+                let startPage = 1
+                try{
+                    console.log('dbProject.idOrigin',dbProject.idOrigin);
+                    webFlats = await pickAPI.getPickFlats({page:startPage, block_id: 73})
+                    console.log('webFlats', webFlats.body);
+                }catch(e){
+                    throw e;
+                }
+            // }
+        } else {
+            throw new Error("developer is not found")
+        }
+
+    } catch (e) {
+        throw e;
+    }
+
+
 }

@@ -18,5 +18,5 @@ router.get('/GetPickBlocks', pickCtr.GetPickBlocks);
 router.get('/GetPickBulks', pickCtr.GetPickBulks);
 router.get('/GetPickChanges', pickCtr.GetPickChanges);
 router.get('/GetNewPickProjects', pickCtr.GetNewPickProjects);
-
+router.get('/GetNewPickFlats', pickCtr.GetNewPickFlats)
 module.exports = router;

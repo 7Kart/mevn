@@ -66,14 +66,28 @@ exports.GetPickChanges = (req, res) => {
 }
 
 exports.GetNewPickProjects = (req, res) => {
-    pickRepository.findNewProjects()
-        .then(data => {
+    pickRepository.findNewProjects().then((data) => {
+        res.send({
+            status: 200,
+            data: data
+        });
+    }).catch((err) => {
+        res.send({
+            status: 500,
+            data: err
+        })
+    })
+}
+
+exports.GetNewPickFlats = (req, res) => {
+    pickRepository.getNewPickFlats()
+        .then((result) => {
+            console.log('result', result);
             res.send({
-                status: 200,
-                data: data
-            });
+                status:200
+            })
         })
         .catch((err) => {
-            res.send({ error: err })
+            console.log('err', err);
         })
 }
