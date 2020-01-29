@@ -21,7 +21,7 @@ function ParseFlatsList(query) {
         needle.get(URL, {
             open_timeout: 10000
         }, (err, res) => {
-            //bug (when slow internet and pages get async)           
+            //bug (when internet is slow and pages get async)           
             if (err) {
                 reject(err);
             }
