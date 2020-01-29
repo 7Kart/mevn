@@ -95,21 +95,35 @@ exports.getNewPickFlats = async () => {
     console.log('init find new flats');
     let developer = null;
     try {
-        developer = await Developer.findOne({ name: "ПИК" },{})
+        developer = await Developer.findOne({ name: "ПИК" }, {})
 
         if (developer) {
             // console.log('developer', developer);
-            // for(let dbProject of developer.projects){
-                let dbProject = developer.projects[2]
-                let startPage = 1
-                try{
-                    console.log('dbProject.idOrigin',dbProject.idOrigin);
-                    webFlats = await pickAPI.getPickFlats({page:startPage, block_id: 73})
-                    console.log('webFlats', webFlats.body);
-                }catch(e){
+            for (let dbProject of developer.projects) {
+                // let dbProject = developer.projects[1]
+                let startPage = 0;
+                try {
+                    console.log('dbProject.idOrigin', dbProject.idOrigin);
+                    let webFlats = null;
+
+                    webFlats = await pickAPI.getPickFlats({
+                        page: startPage,
+                        block_id: dbProject.idOrigin
+                    });
+
+                    if (webFlats.body.flats !== undefined) {
+                        do {
+                            webFlats = await pickAPI.getPickFlats({
+                                page: startPage,
+                                block_id: dbProject.idOrigin
+                            });
+                            startPage++;
+                        } while (webFlats.body.flats.length > 0)
+                    }
+                } catch (e) {
                     throw e;
                 }
-            // }
+            }
         } else {
             throw new Error("developer is not found")
         }
