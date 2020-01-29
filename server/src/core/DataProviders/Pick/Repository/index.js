@@ -6,7 +6,6 @@ Location = require("../../../../models/location");
 
 
 exports.getPickChanges = async () => {
-
     return Developer.findOne({ name: "ПИК" }, { projects: 1 }).populate({
         path: "projects.locationId",
         model: "locations",
@@ -25,7 +24,6 @@ exports.getPickChanges = async () => {
             throw new Error("there is no project")
         }
     })
-
 }
 
 //find new pick projects in MSC
@@ -98,28 +96,19 @@ exports.getNewPickFlats = async () => {
         developer = await Developer.findOne({ name: "ПИК" }, {})
 
         if (developer) {
-            // console.log('developer', developer);
             for (let dbProject of developer.projects) {
                 // let dbProject = developer.projects[1]
                 let startPage = 0;
                 try {
                     console.log('dbProject.idOrigin', dbProject.idOrigin);
                     let webFlats = null;
-
-                    webFlats = await pickAPI.getPickFlats({
-                        page: startPage,
-                        block_id: dbProject.idOrigin
-                    });
-
-                    if (webFlats.body.flats !== undefined) {
-                        do {
-                            webFlats = await pickAPI.getPickFlats({
-                                page: startPage,
-                                block_id: dbProject.idOrigin
-                            });
-                            startPage++;
-                        } while (webFlats.body.flats.length > 0)
-                    }
+                    do {
+                        webFlats = await pickAPI.getPickFlats({
+                            page: startPage,
+                            block_id: dbProject.idOrigin
+                        });
+                        startPage++;
+                    } while (webFlats.body.flats && webFlats.body.flats.length > 0)
                 } catch (e) {
                     throw e;
                 }
@@ -131,6 +120,4 @@ exports.getNewPickFlats = async () => {
     } catch (e) {
         throw e;
     }
-
-
 }
