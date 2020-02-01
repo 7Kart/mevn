@@ -1,8 +1,8 @@
 const pickAPI = require('../Source/PickApiGetters'),
     Developer = require("../../../../models/developer"),
-    Flat = require("../../../../models/flat"),
-    mongoose = require("mongoose");
-Location = require("../../../../models/location");
+    PickFlat = require("../../DataModel/PickFlat"),
+    mongoose = require("mongoose"),
+    Location = require("../../../../models/location");
 
 
 exports.getPickChanges = async () => {
@@ -101,14 +101,26 @@ exports.getNewPickFlats = async () => {
                 let startPage = 0;
                 try {
                     console.log('dbProject.idOrigin', dbProject.idOrigin);
-                    let webFlats = null;
+
+                    let webQueryFinishFlag = false;
                     do {
-                        webFlats = await pickAPI.getPickFlats({
+                        let webFlats = null;
+                        const httpResult = await pickAPI.getPickFlats({
                             page: startPage,
                             block_id: dbProject.idOrigin
-                        });
-                        startPage++;
-                    } while (webFlats.body.flats && webFlats.body.flats.length > 0)
+                        })
+                        webFlats = httpResult.body;                        
+                        if (webFlats.flats !== undefined && webFlats.flats.length > 0) {                                                           
+                            webFlats.flats.forEach((flat)=>{                                
+                                let webFlat = new PickFlat(flat);
+                                console.log("webFlat", webFlat)
+                            })
+                            startPage++;
+                            webQueryFinishFlag = false;
+                        } else {
+                            webQueryFinishFlag = true;
+                        }
+                    } while (!webQueryFinishFlag)
                 } catch (e) {
                     throw e;
                 }
@@ -116,7 +128,6 @@ exports.getNewPickFlats = async () => {
         } else {
             throw new Error("developer is not found")
         }
-
     } catch (e) {
         throw e;
     }

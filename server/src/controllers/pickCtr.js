@@ -83,11 +83,14 @@ exports.GetNewPickFlats = (req, res) => {
     pickRepository.getNewPickFlats()
         .then((result) => {
             console.log('result', result);
-            res.send({
-                status:200
-            })
+            // res.send({
+            //     status:200
+            // })
         })
         .catch((err) => {
             console.log('err', err);
         })
+    res.send({
+        status:200
+    })
 }

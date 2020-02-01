@@ -112,6 +112,7 @@ exports.findNewFlats = async function () {
                 if (dbFlat) {
                     //if object is empty                    
                     const changes = flat.compareWithDbEntity(dbFlat)
+
                     if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
                         for (key in changes.new) {
                             dbFlat[key] = changes.new[key]
