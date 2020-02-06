@@ -105,7 +105,7 @@ exports.findNewFlats = async function () {
                 console.log('flat', param.offset);
                 let dbFlat;
                 try {
-                    dbFlat = await Flat.findOne({ "idOrigin": flat.idOrigin });
+                    dbFlat = await Flat.findOne({ "idOrigin": flat.idOrigin, "projectId": project._id});
                 } catch (e) {
                     throw e;
                 }
@@ -124,9 +124,7 @@ exports.findNewFlats = async function () {
                 } else {
                     //if there is changes    
                     flat.dateInsert = requestDate;   //date of request start.              
-                    console.log('project',project);
                     flat.projectId = project._id;
-                    console.log('flat',flat);
                     newFlatArray.push(new Flat(flat));
                 }
             }

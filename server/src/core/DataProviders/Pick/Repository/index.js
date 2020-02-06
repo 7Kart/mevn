@@ -2,8 +2,8 @@ const pickAPI = require('../Source/PickApiGetters'),
     Developer = require("../../../../models/developer"),
     PickFlat = require("../../DataModel/PickFlat"),
     mongoose = require("mongoose"),
-    Location = require("../../../../models/location");
-
+    Location = require("../../../../models/location"),
+    DbFlat = require("../../../../models/flat")
 
 exports.getPickChanges = async () => {
     return Developer.findOne({ name: "ПИК" }, { projects: 1 }).populate({
@@ -97,26 +97,50 @@ exports.getNewPickFlats = async () => {
 
         if (developer) {
             for (let dbProject of developer.projects) {
-                // let dbProject = developer.projects[1]
-                let startPage = 0;
-                try {
-                    console.log('dbProject.idOrigin', dbProject.idOrigin);
 
+                try {
+                    console.log('change project', dbProject._id);
+
+                    let startPage = 0;
                     let webQueryFinishFlag = false;
                     do {
+                        console.log('change page', startPage);
+
                         let webFlats = null;
                         const httpResult = await pickAPI.getPickFlats({
                             page: startPage,
                             block_id: dbProject.idOrigin
                         })
-                        webFlats = httpResult.body;                        
-                        if (webFlats.flats !== undefined && webFlats.flats.length > 0) {                                                           
-                            webFlats.flats.forEach((flat)=>{                                
-                                let webFlat = new PickFlat(flat);
-                                console.log("webFlat", webFlat)
-                            })
+                        webFlats = httpResult.body;
+                        if (webFlats.flats !== undefined && webFlats.flats.length > 0) {
+
+                            var flatsIdOrigin = webFlats.flats.map((flat) => {
+                                return flat.id;
+                            });
+                            const dbFlats = await DbFlat.find({ idOrigin: { $in: flatsIdOrigin }, projectId: dbProject._id })
+
+                            promiseArray = [];
+                            newFlatsToAdd = [];
+
+                            webFlats.flats.forEach((flat) => {
+                                let webFlat = new PickFlat(flat, dbProject._id);
+
+                                let dbFlat = dbFlats.find((dbFlat) => {
+                                    return dbFlat.idOrigin == webFlat.idOrigin;
+                                });
+
+                                if (dbFlat) {
+                                    const changes = webFlat.compareWithDbEntity(dbFlat)
+                                } else {
+                                    console.log("projectId", webFlat)   
+                                    // newFlatsToAdd.push(newDbFlat);
+                                }
+                            });
+
+                            // let result = await Promise.all(dbPromiseArray)
+                            console.log("res", result);
+
                             startPage++;
-                            webQueryFinishFlag = false;
                         } else {
                             webQueryFinishFlag = true;
                         }
