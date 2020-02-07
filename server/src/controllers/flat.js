@@ -1,5 +1,8 @@
-exports.getFlats = function(req,res){
-    res.send([{
-        flat:"ololo"
-    }]);
+Flat = require("../models/flat");
+
+exports.UpdateMongoFlats = async (req, res) => {
+    res.send({
+        status: "ok"
+    })
+
 }

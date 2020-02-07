@@ -1,7 +1,7 @@
 const needle = require('needle'),
     cheerio = require("cheerio"),
     https = require('https'),
-    Flat = require("../../DataModel/Flat"),
+    A101Flat = require("../../DataModel/A101Flat"),
     urlUtils = require('../../../urlUtils');
 
 const BASE_URL = "https://a101.ru"
@@ -21,7 +21,7 @@ function ParseFlatsList(query) {
         needle.get(URL, {
             open_timeout: 10000
         }, (err, res) => {
-            //bug (when slow internet and pages get async)           
+            //bug (when internet is slow and pages get async)           
             if (err) {
                 reject(err);
             }
@@ -40,7 +40,7 @@ function ParseFlatsList(query) {
             const linksListDom = $('.js-flat-list-new-table-item');
 
             linksListDom.each((ind, divRoom) => {
-                let flat = new Flat();
+                let flat = new A101Flat();
                 const linkDom = $(divRoom).children('a')[0];
                 flat.href = linkDom.attribs.href;
                 if (flat.href) {
@@ -65,7 +65,7 @@ function ParseFlatsList(query) {
                         flat.floor = (floors) ? 1 * floors[0] : null;
                         flat.maxFloor = (floors) ? 1 * floors[1] : null;
                     } else if (ind == 5) {
-                        flat.area = $(divDom).text().trim();
+                        flat.area = parceFloarFromStr($(divDom).text().trim());
                     } else if (ind == 6) {
                         flat.dateFinished = convertDate($(divDom).text().trim());
                         flat.dateFinishedStr = $(divDom).text().trim();
@@ -162,6 +162,11 @@ function parceFloor(textValue) {
     }
     return null;
 }
+
+//
+function parceFloarFromStr(str){    
+    return parseFloat(str.replace(",","."))
+} 
 
 //convert dateformat 'mmmm YYYYY г.' в new Date()
 function convertDate(textValue) {

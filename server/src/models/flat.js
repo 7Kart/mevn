@@ -9,7 +9,7 @@ var DevelopersSchema = new Schema({
     district: String,
     pavilion: String,
     maxFloor: Number,
-    area: String,
+    area: Number,
     dateFinished: Date,
     dateFinishedStr: String,
     prisePerMeterStr: String,

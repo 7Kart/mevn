@@ -1,12 +1,11 @@
 const pickAPI = require('../Source/PickApiGetters'),
     Developer = require("../../../../models/developer"),
-    Flat = require("../../../../models/flat"),
-    mongoose = require("mongoose");
-Location = require("../../../../models/location");
-
+    PickFlat = require("../../DataModel/PickFlat"),
+    mongoose = require("mongoose"),
+    Location = require("../../../../models/location"),
+    DbFlat = require("../../../../models/flat")
 
 exports.getPickChanges = async () => {
-
     return Developer.findOne({ name: "ПИК" }, { projects: 1 }).populate({
         path: "projects.locationId",
         model: "locations",
@@ -25,7 +24,6 @@ exports.getPickChanges = async () => {
             throw new Error("there is no project")
         }
     })
-
 }
 
 //find new pick projects in MSC
@@ -95,28 +93,66 @@ exports.getNewPickFlats = async () => {
     console.log('init find new flats');
     let developer = null;
     try {
-        developer = await Developer.findOne({ name: "ПИК" },{})
+        developer = await Developer.findOne({ name: "ПИК" }, {})
 
         if (developer) {
-            // console.log('developer', developer);
-            // for(let dbProject of developer.projects){
-                let dbProject = developer.projects[2]
-                let startPage = 1
-                try{
-                    console.log('dbProject.idOrigin',dbProject.idOrigin);
-                    webFlats = await pickAPI.getPickFlats({page:startPage, block_id: 73})
-                    console.log('webFlats', webFlats.body);
-                }catch(e){
+            for (let dbProject of developer.projects) {
+
+                try {
+                    console.log('change project', dbProject._id);
+
+                    let startPage = 0;
+                    let webQueryFinishFlag = false;
+                    do {
+                        console.log('change page', startPage);
+
+                        let webFlats = null;
+                        const httpResult = await pickAPI.getPickFlats({
+                            page: startPage,
+                            block_id: dbProject.idOrigin
+                        })
+                        webFlats = httpResult.body;
+                        if (webFlats.flats !== undefined && webFlats.flats.length > 0) {
+
+                            var flatsIdOrigin = webFlats.flats.map((flat) => {
+                                return flat.id;
+                            });
+                            const dbFlats = await DbFlat.find({ idOrigin: { $in: flatsIdOrigin }, projectId: dbProject._id })
+
+                            promiseArray = [];
+                            newFlatsToAdd = [];
+
+                            webFlats.flats.forEach((flat) => {
+                                let webFlat = new PickFlat(flat, dbProject._id);
+
+                                let dbFlat = dbFlats.find((dbFlat) => {
+                                    return dbFlat.idOrigin == webFlat.idOrigin;
+                                });
+
+                                if (dbFlat) {
+                                    const changes = webFlat.compareWithDbEntity(dbFlat)
+                                } else {
+                                    console.log("projectId", webFlat)   
+                                    // newFlatsToAdd.push(newDbFlat);
+                                }
+                            });
+
+                            // let result = await Promise.all(dbPromiseArray)
+                            console.log("res", result);
+
+                            startPage++;
+                        } else {
+                            webQueryFinishFlag = true;
+                        }
+                    } while (!webQueryFinishFlag)
+                } catch (e) {
                     throw e;
                 }
-            // }
+            }
         } else {
             throw new Error("developer is not found")
         }
-
     } catch (e) {
         throw e;
     }
-
-
 }
