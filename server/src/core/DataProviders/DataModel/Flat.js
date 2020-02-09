@@ -1,3 +1,4 @@
+
 module.exports = class Flat {
     constructor() {
         this.imgSrc = null;
@@ -24,16 +25,19 @@ module.exports = class Flat {
         this.design = null;
         this.business = null;
         this.block = false;
-        this.projectId = false;
+        this.projectId = null;
     }
 
     compareWithDbEntity(dbFlat) {
+        const ignorFields = ["projectId", "district"];
+        
         var difference = {
             new: {},
             old: {}
         };
+
         for (let key in this) {
-            if (this.hasOwnProperty(key)) {
+            if (this.hasOwnProperty(key) && ignorFields.indexOf(key) < 0) {
                 if (this[key] instanceof Date) {
                     if (this[key].getTime() != dbFlat[key].getTime()) {
                         difference[key] = dbFlat[key];

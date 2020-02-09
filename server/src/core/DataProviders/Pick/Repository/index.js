@@ -119,7 +119,7 @@ exports.getNewPickFlats = async () => {
                             });
                             const dbFlats = await DbFlat.find({ idOrigin: { $in: flatsIdOrigin }, projectId: dbProject._id })
 
-                            promiseArray = [];
+                            updatePromiseArray = [];
                             newFlatsToAdd = [];
 
                             webFlats.flats.forEach((flat) => {
@@ -131,14 +131,16 @@ exports.getNewPickFlats = async () => {
 
                                 if (dbFlat) {
                                     const changes = webFlat.compareWithDbEntity(dbFlat)
+                                    
                                 } else {
-                                    console.log("projectId", webFlat)   
-                                    // newFlatsToAdd.push(newDbFlat);
+                                    newFlatsToAdd.push(webFlat);
+                                    console.log("NEW FLATS!!!");
                                 }
                             });
-
-                            // let result = await Promise.all(dbPromiseArray)
-                            console.log("res", result);
+                            
+                            var insertedFlats = await DbFlat.insertMany(newFlatsToAdd);
+                            
+                            let result = await Promise.all(updatePromiseArray)
 
                             startPage++;
                         } else {
