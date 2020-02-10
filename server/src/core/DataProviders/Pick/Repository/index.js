@@ -132,10 +132,14 @@ exports.getNewPickFlats = async () => {
                                 if (dbFlat) {
                                     const changes = webFlat.compareWithDbEntity(dbFlat)
                                 } else {
-                                    console.log("projectId", webFlat)   
-                                    // newFlatsToAdd.push(newDbFlat);
+                                    console.log("projectId", webFlat)
+                                    newFlatsToAdd.push(webFlat);
                                 }
                             });
+
+                            if (newFlatsToAdd.length > 0) {
+                                
+                            }
 
                             // let result = await Promise.all(dbPromiseArray)
                             console.log("res", result);
