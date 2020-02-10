@@ -1,7 +1,9 @@
 const A101Repository = require('../../core/DataProviders/A101/Repository'),
     path = require('path'),
     moment = require('moment'),
-    fs = require('fs');
+    fs = require('fs'),
+    PickRepository = require('../../core/DataProviders/Pick/Repository');
+
 
 exports.GetNewDevelopersProjects = function () {
     let newProjects = [];
@@ -40,3 +42,23 @@ exports.GetA101Flats = function () {
         })
 }
 
+//get new pick flats
+exports.GetNewPickFlatsJob = () => {
+    const statrtTime = new Date();
+    let logDirectoryPath = path.resolve('__dirname', '../logs/jobs/newA101Flats.txt');
+    let logString = "";
+    PickRepository.getNewPickFlats()
+        .then((stats) => {
+            const endJobTime = new Date();
+            logString = `job "find new Pick's job" start at ${moment(statrtTime).format('MMMM Do YYYY, hh:mm:ss')} complete ${moment(endJobTime).format('MMMM Do YYYY, hh:mm:ss')}, update:${stats.update}, add:${stats.add}`;
+        })
+        .catch(e => {
+            logString = "err duaring get new flat" + e;
+        })
+        .finally(() => {
+            fs.appendFile(logDirectoryPath, `${logString}\n`, 'utf8', function (err) {
+                if (!err)
+                    console.log("file has been saved.");
+            });
+        });
+}

@@ -92,20 +92,21 @@ exports.findNewProjects = async () => {
 exports.getNewPickFlats = async () => {
     console.log('init find new flats');
     let developer = null;
+    const requestDate = new Date();
+
     try {
         developer = await Developer.findOne({ name: "ПИК" }, {})
-
+        let status = {
+            update: 0,
+            add: 0,
+            date: requestDate
+        } 
         if (developer) {
             for (let dbProject of developer.projects) {
-
                 try {
-                    console.log('change project', dbProject._id);
-
                     let startPage = 0;
                     let webQueryFinishFlag = false;
                     do {
-                        console.log('change page', startPage);
-
                         let webFlats = null;
                         const httpResult = await pickAPI.getPickFlats({
                             page: startPage,
@@ -119,7 +120,7 @@ exports.getNewPickFlats = async () => {
                             });
                             const dbFlats = await DbFlat.find({ idOrigin: { $in: flatsIdOrigin }, projectId: dbProject._id })
 
-                            promiseArray = [];
+                            updatePromiseArray = [];
                             newFlatsToAdd = [];
 
                             webFlats.flats.forEach((flat) => {
@@ -130,20 +131,33 @@ exports.getNewPickFlats = async () => {
                                 });
 
                                 if (dbFlat) {
-                                    const changes = webFlat.compareWithDbEntity(dbFlat)
+                                    const changes = webFlat.compareWithDbEntity(dbFlat);
+                                    
+                                    if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
+                                        for (key in changes.new) {
+                                            dbFlat[key] = changes.new[key]
+                                        }
+                                        changes.old['dtChanges'] = requestDate; //date of request start.   
+                                        dbFlat.changes.push(changes.old);
+                                        updatePromiseArray.push(dbFlat.save());
+                                    }
                                 } else {
-                                    console.log("projectId", webFlat)
                                     newFlatsToAdd.push(webFlat);
                                 }
                             });
 
                             if (newFlatsToAdd.length > 0) {
-                                
+                                let insertedFlats = null;
+                                try{
+                                    insertedFlats = await DbFlat.insertMany(newFlatsToAdd);
+                                }catch(e){
+                                    throw e;
+                                }
+                                status.add += insertedFlats.length
                             }
-
-                            // let result = await Promise.all(dbPromiseArray)
-                  
-
+                            let result = await Promise.all(updatePromiseArray)                            
+                            status.update += result.length;
+                            
                             startPage++;
                         } else {
                             webQueryFinishFlag = true;
@@ -153,6 +167,7 @@ exports.getNewPickFlats = async () => {
                     throw e;
                 }
             }
+            return status
         } else {
             throw new Error("developer is not found")
         }
