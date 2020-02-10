@@ -142,7 +142,7 @@ exports.getNewPickFlats = async () => {
                             }
 
                             // let result = await Promise.all(dbPromiseArray)
-                            console.log("res", result);
+                  
 
                             startPage++;
                         } else {
