@@ -1,18 +1,19 @@
 <template>
   <div class="home">
     <SearchInputBars></SearchInputBars>
+    <FlatList></FlatList>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-
+import FlatList from "@/components/FlatsList";
 import SearchInputBars from "@/components/SearchInputBars";
 
 export default {
   name: "Home",
   components: {
-    SearchInputBars
+    SearchInputBars,
+    FlatList
   }
 };
 </script>
