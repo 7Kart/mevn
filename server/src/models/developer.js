@@ -41,7 +41,30 @@ DevelopersSchema.static('findAndFilterProjects', function (devName, locationId) 
     ]);
 });
 
-DevelopersSchema.static('addNewProjects', function(developerId, newProjects){
+DevelopersSchema.static('getAllDevelopersName', function () {
+    return this.find({}, { _id: 1, name: 1 });
+});
+
+DevelopersSchema.static('getDevelopersProjects', function (developersIds) {
+
+    developersIds = developersIds.map(el => {
+        return new mongoose.Types.ObjectId(el);
+    });
+
+    return this.aggregate([
+        { "$match": { _id: { $in: developersIds } } },
+        { "$unwind": "$projects" },
+        {
+            "$group": {
+                "_id": 0,
+                "allProjects": { "$push": "$projects" }
+            }
+        },
+        { "$project": { "_id": 0, "projects": "$allProjects" } }
+    ])
+});
+
+DevelopersSchema.static('addNewProjects', function (developerId, newProjects) {
     return this.updateOne(
         { "_id": mongoose.Types.ObjectId(developerId) },
         {
@@ -52,6 +75,6 @@ DevelopersSchema.static('addNewProjects', function(developerId, newProjects){
             }
         }
     );
-})
+});
 
 module.exports = mongoose.model('developers', DevelopersSchema);

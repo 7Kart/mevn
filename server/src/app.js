@@ -6,20 +6,23 @@ const morgan = require('morgan');
 const config = require('config');
 const cron = require('../src/cron/shedule.js');
 
-mongoose.connect(config.get("app.dbConfig.connectionString"), { useNewUrlParser: true, dbName:"hives" });
+mongoose.connect(config.get("app.dbConfig.connectionString"), { useNewUrlParser: true, dbName: "hives" });
 
 mongoose.connection.on("connected", () => {
-    
+
     const app = express();
-    
+    app.use(cors());
     app.use(morgan('dev'));
     app.use(require('./routers'));
     app.use('/developers', require('./routers/developers'));
 
     app.use(bodyParser.json());
-    app.use(cors());
+    app.use((err, req, res, next) => {
+        console.log("err", err);
+        res.status(400).send({mesage:"test"})
+    })
 
-    app.listen(process.env.PORT || config.get("app.port"), ()=>{
+    app.listen(process.env.PORT || config.get("app.port"), () => {
         console.log(`server start on port ${config.get("app.port")}`);
         cron.initCronJobs();
     });

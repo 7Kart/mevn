@@ -1,7 +1,7 @@
 {
     "app": {
         "dbConfig": {
-            "connectionString": "mongodb+srv://user1:<>@cluster0-i35gr.mongodb.net/test?retryWrites=true&w=majority"
+            "connectionString": "mongodb+srv://user1:23022003ART@cluster0-i35gr.mongodb.net/test?retryWrites=true&w=majority"
         },
         "port": "8081"
     }

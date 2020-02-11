@@ -1,13 +1,24 @@
 const Developer = require("../models/developer");
 
-exports.GetAllDevelopers = async function(req, res){
-    try{
-        const developers = await Developer.find({},{
-            "projects.name": true, 
-            "projects.originId": true
-        });
-        res.send(developers);
-    }catch(err){
-        throw err;
+exports.getAllDevelopers = async (req, res, next) => {
+    try {
+        const developers = await Developer.getAllDevelopersName();
+        res.json(developers);
+    } catch (e) {
+        next(e);
     }
+};
+
+exports.getDevelopersProjects = async (req, res, next) => {
+
+    let projects = [];
+
+    if(req.query.ids && req.query.ids.length > 0){
+        projects = await Developer.getDevelopersProjects(req.query.ids);
+        projects = projects.length > 0 ? projects[0].projects : projects;
+    }       
+    
+    res.json({
+        projects: projects
+    }) 
 }
