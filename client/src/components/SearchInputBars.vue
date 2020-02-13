@@ -29,6 +29,7 @@
 </template>
 
 <script>
+
 export default {
   data() {
     return {
@@ -46,6 +47,7 @@ export default {
   },
   mounted() {
     this.$store.dispatch("getAllDevelopers");
+
   },
   methods: {
     onSelectDeveloper() {
