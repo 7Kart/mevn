@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <FlatItem v-for="flat in flats" :key="flat._id" :flat-value="flat"></FlatItem>
+      <FlatItem v-for="flat in getFlats" :key="flat._id" :flat-value="flat"></FlatItem>
     </v-row>
   </v-container>
 </template>
@@ -13,14 +13,15 @@ export default {
   components: {
     FlatItem
   },
-  data() {
-    return {
-        flats: this.$store.getters.getFlats
-    };
+  computed: {
+    getFlats() {
+      console.log(`this.$store.getters.getFlats`, this.$store.getters.getFlats);
+      
+      return this.$store.getters.getFlats;
+    }
   },
-  
   mounted() {
-      console.log("this.$store.getters.flats", this.$store.getters.getFlats)
-  },
+    this.$store.dispatch("getFlats");
+  }
 };
 </script>
