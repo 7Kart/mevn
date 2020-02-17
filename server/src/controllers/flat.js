@@ -7,6 +7,9 @@ exports.UpdateMongoFlats = async (req, res) => {
 }
 
 exports.GetFlats = async (req, res, next) => {
+    
+    console.log("req.query", req.query);
+    
     try {
         const flats = await Flat.find({})
             .skip(0)

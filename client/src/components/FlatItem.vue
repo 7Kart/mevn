@@ -1,7 +1,7 @@
 <template>
-  <v-col cols="3">
-    <v-card >
-      <v-img :src="flatValue.imgSrc" height="200px"></v-img>
+  <v-col cols="4">
+    <v-card>
+      <v-img :src="flatValue.imgSrc"></v-img>
 
       <v-card-title>{{flatValue.district}}</v-card-title>
 
@@ -14,16 +14,29 @@
 
         <v-spacer></v-spacer>
 
-        <v-btn icon @click="show = !show">
+        <v-btn v-show="getFlatCoast.length > 1" icon @click="show = !show">
           <v-icon>{{ show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
         </v-btn>
       </v-card-actions>
 
       <v-expand-transition>
-        <div v-show="show">
+        <div v-if="getFlatCoast.length > 1" v-show="show">
           <v-divider></v-divider>
 
-          <v-card-text>I'm a thing. But, like most politicians, he promised more than he could deliver. You won't have time for sleeping, soldier, not with all the bed making you'll be doing. Then we'll go with that data file! Hey, you add a one and two zeros to that or we walk! You're going to do his laundry? I've got to find a way to escape.</v-card-text>
+          <v-card-text>
+            <v-sheet color="cyan">
+              <v-sparkline
+                :value="getFlatCoast"
+                :labels="getFlatCoast"
+                label-size="9"
+                color="rgba(255, 255, 255, .7)"
+                height="100"
+                padding="24"
+                stroke-linecap="round"
+                smooth
+              ></v-sparkline>
+            </v-sheet>
+          </v-card-text>
         </div>
       </v-expand-transition>
     </v-card>
@@ -38,10 +51,20 @@ export default {
       required: true
     }
   },
-  data(){
-    return{
-      show: false
+  computed: {
+    getFlatCoast() {
+      let coastList = [];
+      this.flatValue.changes.forEach(change => {
+        if (change["coast"]) coastList.push(change["coast"]);
+      });
+      coastList.push(this.flatValue.coast);
+      return coastList;
     }
+  },
+  data() {
+    return {
+      show: false
+    };
   }
 };
 </script>

@@ -1,7 +1,12 @@
 <template>
   <v-container>
     <v-row>
-      <FlatItem v-for="flat in getFlats" :key="flat._id" :flat-value="flat"></FlatItem>
+      <FlatItem 
+        v-for="flat in getFlats" 
+        :key="flat._id" 
+        :flat-value="flat"
+        >
+      </FlatItem>
     </v-row>
   </v-container>
 </template>
