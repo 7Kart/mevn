@@ -1,12 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <FlatItem 
-        v-for="flat in getFlats" 
-        :key="flat._id" 
-        :flat-value="flat"
-        >
-      </FlatItem>
+      <FlatItem v-for="flat in getFlats" :key="flat._id" :flat-value="flat"></FlatItem>
     </v-row>
   </v-container>
 </template>
@@ -21,12 +16,16 @@ export default {
   computed: {
     getFlats() {
       console.log(`this.$store.getters.getFlats`, this.$store.getters.getFlats);
-      
       return this.$store.getters.getFlats;
     }
   },
   mounted() {
     this.$store.dispatch("getFlats");
+  },
+  methods: {
+    onScroll(e) {
+      console.log("e.target.scrollTop", e.target.scrollTop);
+    }
   }
 };
 </script>

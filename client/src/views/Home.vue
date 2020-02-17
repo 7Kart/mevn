@@ -14,6 +14,9 @@ export default {
   components: {
     SearchInputBars,
     FlatList
-  }
+  },  
 };
+
+
+
 </script>
