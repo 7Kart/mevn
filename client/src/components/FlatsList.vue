@@ -1,7 +1,8 @@
 <template>
-  <v-container>
+  <v-container v-scroll:#scrolling-flats="onScroll">
     <v-row>
       <FlatItem v-for="flat in getFlats" :key="flat._id" :flat-value="flat"></FlatItem>
+      <v-progress-linear v-show="getFlatsLoadingStatus && getFlats.length>0" indeterminate color="cyan"></v-progress-linear>
     </v-row>
   </v-container>
 </template>
@@ -15,8 +16,11 @@ export default {
   },
   computed: {
     getFlats() {
-      console.log(`this.$store.getters.getFlats`, this.$store.getters.getFlats);
       return this.$store.getters.getFlats;
+    },
+    //loaded flats flag
+    getFlatsLoadingStatus() {
+      return this.$store.getters.getFlatsLoadingStatus;
     }
   },
   mounted() {
@@ -24,7 +28,16 @@ export default {
   },
   methods: {
     onScroll(e) {
-      console.log("e.target.scrollTop", e.target.scrollTop);
+      console.log("this.getFlatsLoadingStatus", this.getFlatsLoadingStatus);
+      if (this.getFlatsLoadingStatus) {
+        e.preventDefault();
+      }
+
+      if (e.target.offsetHeight + e.target.scrollTop == e.target.scrollHeight) {
+        this.$store.dispatch("changePage");
+        this.$store.dispatch("getFlats");
+        console.log(true);
+      }
     }
   }
 };

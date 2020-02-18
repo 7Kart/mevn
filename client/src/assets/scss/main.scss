@@ -1,5 +1,9 @@
 @import "common/index.scss";
 
 html{
-    overflow-y: scroll;
+    overflow-y: hidden;
+}
+
+#scrolling-flats{
+    height: calc(100vh - 48px) ;
 }

@@ -1,12 +1,16 @@
 <template>
-  <v-col cols="4">
+  <v-col xs="12" sm="6" md="4" lg="4" xl="3">
     <v-card>
       <v-img :src="flatValue.imgSrc"></v-img>
 
       <v-card-title>{{flatValue.district}}</v-card-title>
 
       <v-card-subtitle>цена : {{flatValue.coast}}</v-card-subtitle>
+      <v-card-text class="text--primary">
+        <div>Этаж: {{flatValue.floor}}</div>
 
+        <div>Сдача: {{getYear(flatValue.dateFinished)}}</div>
+      </v-card-text>
       <v-card-actions>
         <v-btn text>Share</v-btn>
 
@@ -22,7 +26,6 @@
       <v-expand-transition>
         <div v-if="getFlatCoast.length > 1" v-show="show">
           <v-divider></v-divider>
-
           <v-card-text>
             <v-sheet color="cyan">
               <v-sparkline
@@ -65,6 +68,11 @@ export default {
     return {
       show: false
     };
+  },
+  methods: {
+    getYear(date) {
+      return `${new Date(date).getFullYear()} г.`;
+    }    
   }
 };
 </script>

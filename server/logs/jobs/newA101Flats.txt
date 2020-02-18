@@ -71,3 +71,7 @@ errwhen get new flatError: get db project error
 err duaring get new flatMongoError: no primary server available
 job start at February 17th 2020, 09:00:00 complete February 17th 2020, 09:03:50, update:13, add:0
 job "find new Pick's job" start at February 17th 2020, 10:00:00 complete February 17th 2020, 10:01:34, update:163, add:17
+job start at February 18th 2020, 12:00:00 complete February 18th 2020, 12:09:51, update:29, add:0
+job "find new Pick's job" start at February 18th 2020, 01:00:00 complete February 18th 2020, 01:08:29, update:1117, add:2
+job start at February 18th 2020, 03:00:02 complete February 18th 2020, 03:09:40, update:11, add:1
+job "find new Pick's job" start at February 18th 2020, 04:00:02 complete February 18th 2020, 04:08:02, update:54, add:47

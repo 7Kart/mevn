@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home-page">
     <SearchInputBars></SearchInputBars>
     <FlatList></FlatList>
   </div>
@@ -14,9 +14,11 @@ export default {
   components: {
     SearchInputBars,
     FlatList
-  },  
+  }   
 };
 
-
-
 </script>
+
+<style lang="scss">
+  
+</style>

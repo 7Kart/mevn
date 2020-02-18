@@ -12,7 +12,7 @@ exports.GetFlats = async (req, res, next) => {
     
     try {
         const flats = await Flat.find({})
-            .skip(0)
+            .skip(req.query.page*20)
             .limit(20);
         res.send({
             flats
