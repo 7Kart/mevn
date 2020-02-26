@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
-const config = require('config');
 const cron = require('../src/cron/shedule.js');
+require('dotenv').config()
 
-mongoose.connect(config.get("app.dbConfig.connectionString"), { useNewUrlParser: true, dbName: "hives" });
+mongoose.connect(process.env.DB_CONNECTION_STRING, { useNewUrlParser: true, dbName: "hives" });
 
 mongoose.connection.on("connected", () => {
 
@@ -23,8 +23,8 @@ mongoose.connection.on("connected", () => {
         res.status(400).send({mesage:"test"})
     })
 
-    app.listen(process.env.PORT || config.get("app.port"), () => {
-        console.log(`server start on port ${config.get("app.port")}`);
+    app.listen(process.env.PORT || process.env.PORT, () => {
+        console.log(`server start on port ${process.env.PORT}`);
         cron.initCronJobs();
     });
 })
