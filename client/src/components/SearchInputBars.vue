@@ -20,8 +20,19 @@
             item-value="_id"
             label="Проект"
             :multiple="true"
-            v-model="developersProjectsIds"            
+            v-model="developersProjectsIds"
           ></v-select>
+        </v-col>
+
+        <v-col md="3" cols="12" sm="6">
+          <v-range-slider
+            v-model="roomCountRange"
+            :max="max"
+            :min="min"
+            thumb-label="always"
+            :thumb-size="20"
+          >
+          </v-range-slider>
         </v-col>
       </v-row>
     </v-container>
@@ -29,12 +40,14 @@
 </template>
 
 <script>
-
 export default {
   data() {
     return {
       developersIds: [],
-      developersProjectsIds: []
+      developersProjectsIds: [],
+      roomCountRange: [1, 4],
+      min: 1,
+      max: 4
     };
   },
   computed: {
@@ -47,7 +60,6 @@ export default {
   },
   mounted() {
     this.$store.dispatch("getAllDevelopers");
-
   },
   methods: {
     onSelectDeveloper() {
