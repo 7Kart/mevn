@@ -13,6 +13,7 @@
             @change="onSelectDeveloper"
           ></v-select>
         </v-col>
+
         <v-col md="3" cols="12" sm="6">
           <v-select
             :items="developersProjects"
@@ -24,16 +25,39 @@
           ></v-select>
         </v-col>
 
-        <v-col md="3" cols="12" sm="6">
+        <v-col md="6" cols="12" sm="12" class="range-slider-container">
           <v-range-slider
+            style="margin-bottom:18px"
             v-model="roomCountRange"
-            :max="max"
-            :min="min"
+            :max="roomCountMax"
+            :min="roomCountMin"
+            :hide-details="true"
             thumb-label="always"
-            :thumb-size="20"
-          >
-          </v-range-slider>
+            :thumb-size="24"
+            label="Количество комнат"
+          ></v-range-slider>
         </v-col>
+
+        <v-col md="6" cols="12" sm="12" class="range-slider-container">
+          <v-range-slider
+            style="margin-bottom:18px"
+            v-model="areaRange"
+            :max="areaMax"
+            :min="areaMin"
+            :hide-details="true"
+            thumb-label="always"
+            :thumb-size="24"
+            label="Площадь"
+          ></v-range-slider>
+        </v-col>
+
+        <v-col md="12" cols="12" sm="12" class="pa-1 text-center" @click="acceptFilter">
+          <div class="my-auto mx-auto">
+            <v-btn small color="primary">Применить</v-btn>
+            <v-btn small>сбросить</v-btn>
+          </div>
+        </v-col>
+
       </v-row>
     </v-container>
   </v-form>
@@ -43,11 +67,14 @@
 export default {
   data() {
     return {
-      developersIds: [],
+      developersIds: this.$store.getters.getDeveloperFilter,
       developersProjectsIds: [],
-      roomCountRange: [1, 4],
-      min: 1,
-      max: 4
+      roomCountRange: this.$store.getters.getRommRange,
+      roomCountMin: this.$store.getters.getRoomCountFilter.min,
+      roomCountMax: this.$store.getters.getRoomCountFilter.max,
+      areaMin: this.$store.getters.getAreaFilter.min,
+      areaMax: this.$store.getters.getAreaFilter.max,
+      areaRange: this.$store.getters.getAreaRange
     };
   },
   computed: {
@@ -63,9 +90,18 @@ export default {
   },
   methods: {
     onSelectDeveloper() {
-      console.log("developers", this.developersIds);
-      this.$store.dispatch("getDevelopersProjects", this.developersIds);
+      this.$store.dispatch("getDevelopersProjects", this.developersIds);      
+    },
+    acceptFilter(){
+      console.log("filters", this.$store.getters.getAllFilterValues)
     }
   }
 };
 </script>
+
+<style lang="scss">
+.range-slider-container {
+  display: flex;
+  align-items: flex-end;
+}
+</style>

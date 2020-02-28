@@ -77,3 +77,8 @@ job start at February 18th 2020, 03:00:02 complete February 18th 2020, 03:09:40,
 job "find new Pick's job" start at February 18th 2020, 04:00:02 complete February 18th 2020, 04:08:02, update:54, add:47
 job start at February 27th 2020, 03:00:00 complete February 27th 2020, 03:04:47, update:221, add:1
 job "find new Pick's job" start at February 27th 2020, 04:00:00 complete February 27th 2020, 04:05:10, update:5629, add:295
+job "find new Pick's job" start at February 28th 2020, 10:00:00 complete February 28th 2020, 10:04:36, update:3499, add:53
+job start at February 28th 2020, 12:00:02 complete February 28th 2020, 12:04:09, update:53, add:1
+job "find new Pick's job" start at February 28th 2020, 01:00:02 complete February 28th 2020, 01:04:10, update:41, add:2
+job start at February 28th 2020, 03:00:00 complete February 28th 2020, 03:04:21, update:9, add:0
+job "find new Pick's job" start at February 28th 2020, 04:00:00 complete February 28th 2020, 04:03:49, update:42, add:2
