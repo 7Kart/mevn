@@ -6,39 +6,38 @@ export default {
         developersProjects: []
     },
     mutations: {
-        getAllDevelopers(state) {
+        getAllDevelopers(state, payload) {
+            state.developers = payload;
+        },
+        getDevelopersProjects(state, payload) {
+            state.developersProjects = payload;
+        }
+    },
+    actions: {
+        getAllDevelopers({ commit }) {
             axios.get('http://localhost:8081/developers/GetAllDevelopers')
                 .then(res => {
                     console.log("developers", res)
                     if (res.status == 200) {
-                        state.developers = res.data;
+                        commit("getAllDevelopers", res.data);
                     }
                 })
                 .catch((e) => {
                     console.log("QUERY ERROR", e.response)
-                })
+                });
         },
-        getDevelopersProjects(state, payload) {
+        getDevelopersProjects({ commit }, payload) {
             axios.get('http://localhost:8081/developers/getDevelopersProjects', {
                 params: {
                     ids: payload
                 }
             })
                 .then(res => {
-                    console.log("res", res)
-                    state.developersProjects = res.data.projects;
+                    commit("getDevelopersProjects", res.data.projects);
                 })
                 .catch(e => {
                     console.log(`QUERY ERROR`, e.response);
-                })
-        }
-    },
-    actions: {
-        getAllDevelopers({ commit }) {
-            commit("getAllDevelopers");
-        },
-        getDevelopersProjects({ commit }, payload) {
-            commit("getDevelopersProjects", payload);
+                });
         }
     },
     getters: {

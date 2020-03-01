@@ -9,17 +9,22 @@ export default {
             min:10
         },      
         projectFilter:[],
-        developerFilter:[]          
+        developerFilter:[],
+        areaRange: null,
+        roomCountRange: null          
     },
 
     mutations:{
         setDeveloperFilter(state, payload){
-            state.developerFilter = payload;
+            state.developerFilter = payload.developerFilter;
+            state.projectFilter = payload.projectFilter;
+            state.areaRange = payload.areaRange;
+            state.roomCountRange = payload.roomCountRange;
         }
     },
 
     actions:{
-        setDeveloperFilter({commit}, payload){
+        setDeveloperFilter({commit}, payload){            
             commit("setDeveloperFilter", payload);
         }
     },
@@ -29,18 +34,20 @@ export default {
             return state.roomCount; 
         },
         getRommRange: state => {
-            return [state.roomCount.min, state.roomCount.max]
+            return ! state.roomCountRange ? [state.roomCount.min, state.roomCount.max] : state.roomCountRange;
         },
         getAreaFilter: state =>{
             return state.area;
         },
         getAreaRange: state =>{
-            return [state.area.min, state.area.max];
+            return !state.areaRange ? [state.area.min, state.area.max] : state.areaRange;
         },
         getAllFilterValues: state => {
             return {
                 projectsIds: state.projectFilter,
-                developersIds: state.developerFilter
+                developersIds: state.developerFilter,
+                areaRange: state.areaRange,
+                roomCountRange: state.roomCountRange
             }
         },
         getDeveloperFilter: state => {

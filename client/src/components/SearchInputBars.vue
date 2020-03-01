@@ -3,6 +3,7 @@
     <v-container>
       <v-row>
         <v-col md="3" cols="12" sm="6">
+          
           <v-select
             :items="getAllDevelopers"
             item-text="name"
@@ -93,7 +94,12 @@ export default {
       this.$store.dispatch("getDevelopersProjects", this.developersIds);      
     },
     acceptFilter(){
-      console.log("filters", this.$store.getters.getAllFilterValues)
+      this.$store.dispatch("setDeveloperFilter", {
+        developerFilter: this.developersIds,
+        projectFilter: this.developersProjectsIds,
+        areaRange: this.areaRange,
+        roomCountRange: this.roomCountRange
+      });      
     }
   }
 };

@@ -2,7 +2,11 @@
   <v-container v-scroll:#scrolling-flats="onScroll">
     <v-row>
       <FlatItem v-for="flat in getFlats" :key="flat._id" :flat-value="flat"></FlatItem>
-      <v-progress-linear v-show="getFlatsLoadingStatus && getFlats.length>0" indeterminate color="cyan"></v-progress-linear>
+      <v-progress-linear
+        v-show="getFlatsLoadingStatus && getFlats.length>0"
+        indeterminate
+        color="cyan"
+      ></v-progress-linear>
     </v-row>
   </v-container>
 </template>
@@ -21,6 +25,17 @@ export default {
     //loaded flats flag
     getFlatsLoadingStatus() {
       return this.$store.getters.getFlatsLoadingStatus;
+    },
+
+    getAllFilterValues() {
+      return this.$store.getters.getAllFilterValues;
+    }
+  },
+  watch: {
+    getAllFilterValues(filters) {
+      console.log("filter change", filters);
+      this.$store.dispatch("changePage", 0);
+      this.$store.dispatch("getFlats", filters);
     }
   },
   mounted() {
@@ -28,15 +43,11 @@ export default {
   },
   methods: {
     onScroll(e) {
-      console.log("this.getFlatsLoadingStatus", this.getFlatsLoadingStatus);
-      if (this.getFlatsLoadingStatus) {
-        e.preventDefault();
-      }
-
-      if (e.target.offsetHeight + e.target.scrollTop == e.target.scrollHeight) {
-        this.$store.dispatch("changePage");
-        this.$store.dispatch("getFlats");
-        console.log(true);
+      if (!this.getFlatsLoadingStatus) {
+        if (e.target.offsetHeight + e.target.scrollTop == e.target.scrollHeight) {
+          this.$store.dispatch("changePage");
+          this.$store.dispatch("getFlats", this.getAllFilterValues);
+        }
       }
     }
   }

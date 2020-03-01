@@ -1,6 +1,11 @@
 import axios from 'axios';
+import filterParams from "./filterParams";
 
 export default {
+    modules: {
+        filterParams
+    },
+
     state: {
         flats: [],
         currentPage: 0,
@@ -8,41 +13,52 @@ export default {
     },
     mutations: {
         getFlats(state, payload) {
-            state.flatIsLoading = true;
+            if (state.currentPage == 0)
+                state.flats = payload;
+            else
+                state.flats.push(...payload);
+        },
+        changePage(state, payload) {            
+            if (payload === undefined || payload === null)
+                state.currentPage++;
+            else
+                state.currentPage = payload;
+        },
+        changeLoadFlatFlag(state, payload) {
+            state.flatIsLoading = payload;
+        }
+    },
+    actions: {
+        getFlats({ state, commit }, payload) {
+            commit("changeLoadFlatFlag", true);
             axios.get("http://localhost:8081/flats/GetFlats", {
                 params: {
-                    page: state.currentPage
+                    page: state.currentPage,
+                    ...payload
                 }
             })
                 .then((res => {
                     if (res.status == 200) {
-                        state.flats.push(...res.data.flats);
+                        commit("getFlats", res.data.flats);
                     }
                 }))
                 .catch(e => {
                     console.log(`Get flats error`);
                 })
                 .finally(() => {
-                    state.flatIsLoading = false;
+                    commit("changeLoadFlatFlag", false);
                 });
         },
-        changePage(state) {
-            state.currentPage++;
-        }
-    },
-    actions: {
-        getFlats({ commit }, payload) {
-            commit("getFlats", payload);
-        },
-        changePage({ commit }) {
-            commit("changePage");
+
+        changePage({ commit }, payload) {
+            commit("changePage", payload);
         }
     },
     getters: {
         getFlats: state => {
             return state.flats
         },
-        getFlatsLoadingStatus: state =>{
+        getFlatsLoadingStatus: state => {
             return state.flatIsLoading;
         }
     }
