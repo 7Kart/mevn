@@ -3,7 +3,7 @@ const Flat = require('./Flat');
 module.exports = class PickFlat extends Flat{
     constructor(flat, projectId){
         super();   
-        this.href = `https://www.pik.ru/sp/flats/${flat.id}`  
+        this.href = `https://www.pik.ru/${flat.block.url}/flats/${flat.id}`  
         this.imgSrc = flat.layout.flat_plan_png;
         this.roomsCount = flat.rooms == "studio" ? 1 : flat.rooms;
         this.floor = flat.floor;

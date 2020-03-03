@@ -1,6 +1,6 @@
 const PickAPI = require("../core/DataProviders/Pick/Source/PickApiGetters"),
-    pickRepository = require("../core/DataProviders/Pick/Repository/index");
-
+    pickRepository = require("../core/DataProviders/Pick/Repository/index"),
+    Developer = require("../models/developer")
 //get all Pick's locations
 exports.GetPickLocation = (req, res) => {
     PickAPI.getPickLocation()
@@ -91,6 +91,28 @@ exports.GetNewPickFlats = (req, res) => {
             console.log('err', err);
         })
     res.send({
-        status:200
+        status: 200
+    })
+}
+
+
+exports.changePickLinks = async (req, res) => {
+    const dbProjectQuery = await Developer.getDevelopersProjects(["5e1b6e441c9d44000012a99b"]);
+    const blocks = await PickAPI.getPickBlocks()
+
+    for (let project of dbProjectQuery[0].projects) {
+
+        const originBlock = blocks.body.find(block => {
+            return block.id == project.idOrigin;
+        });
+
+        if(originBlock != undefined && originBlock.url != null){
+            
+        }
+        
+    }
+
+    res.send({
+        status: 200
     })
 }

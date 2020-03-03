@@ -3,18 +3,6 @@ const A101Parser = require("../Source/A101Parser"),
     Developer = require("../../../../models/developer"),
     Flat = require("../../../../models/flat");
 
-
-// filter params: 
-// complex,
-// floor_0, 
-// floor_1, 
-// room=, 
-// building, 
-// price_0, 
-// price_1, 
-// area_0, 
-// area_1
-
 exports.getFilterParams = getFilterParams;
 
 // find new projects on site a101

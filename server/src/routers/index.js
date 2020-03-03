@@ -2,7 +2,6 @@ const express = require('express'),
     router = express.Router(),
     a101Ctr = require('../controllers/A101ctr'),
     pickCtr = require('../controllers/pickCtr'),
-
     flatCtr = require("../controllers/flat")
 
 //A101
@@ -21,6 +20,10 @@ router.get('/GetPickBulks', pickCtr.GetPickBulks);
 router.get('/GetPickChanges', pickCtr.GetPickChanges);
 router.get('/GetNewPickProjects', pickCtr.GetNewPickProjects);
 router.get('/GetNewPickFlats', pickCtr.GetNewPickFlats)
+
+
+router.get('/changePickLinks', pickCtr.changePickLinks)
+
 
 
 router.get('/mongoUtil', flatCtr.UpdateMongoFlats)

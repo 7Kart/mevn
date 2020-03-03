@@ -1,4 +1,6 @@
-Flat = require("../models/flat");
+const Flat = require("../models/flat"),
+    Developers = require("../models/developer");
+
 
 exports.UpdateMongoFlats = async (req, res) => {
     res.send({
@@ -7,22 +9,22 @@ exports.UpdateMongoFlats = async (req, res) => {
 }
 
 exports.GetFlats = async (req, res, next) => {
-    
-    console.log("req.query", req.query);
-    
-    const{developerFilter, projectFilter, areaRange, roomCountRange, page} = req.query;
-
-    console.log('page: ', page);
-    console.log('developerFilter: ', developerFilter);
-    console.log('projectFilter: ', projectFilter);
-    console.log('areaRange: ', areaRange);
-    console.log('roomCountRange: ', roomCountRange);
-
-
+    const { developerFilter, projectFilter, areaRange, roomCountRange, page } = req.query;
+    let query = {};
+    if (areaRange !== undefined)
+        query["area"] = { $gte: areaRange[0], $lte: areaRange[1] };
+    if (roomCountRange)
+        query["roomsCount"] = { $gte: roomCountRange[0], $lte: roomCountRange[1] };
+    if (projectFilter !== undefined)
+        query["projectId"] = { $in: projectFilter };
+    if (developerFilter && projectFilter === undefined) {
+        const projects = await Developers.getProjectsIds(developerFilter);
+        if (projects.length > 0) {
+            query["projectId"] = { $in: projects };
+        }
+    }
     try {
-        const flats = await Flat.find({})
-            .skip(req.query.page*20)
-            .limit(20);
+        const flats = await Flat.getFlatWithPag(query, page);
         res.send({
             flats
         });
@@ -30,5 +32,4 @@ exports.GetFlats = async (req, res, next) => {
     catch (e) {
         next(e);
     }
-
 } 

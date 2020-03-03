@@ -46,11 +46,9 @@ DevelopersSchema.static('getAllDevelopersName', function () {
 });
 
 DevelopersSchema.static('getDevelopersProjects', function (developersIds) {
-
     developersIds = developersIds.map(el => {
         return new mongoose.Types.ObjectId(el);
     });
-
     return this.aggregate([
         { "$match": { _id: { $in: developersIds } } },
         { "$unwind": "$projects" },
@@ -63,6 +61,34 @@ DevelopersSchema.static('getDevelopersProjects', function (developersIds) {
         { "$project": { "_id": 0, "projects": "$allProjects" } }
     ])
 });
+
+DevelopersSchema.static("getProjectsIds", function (developersIds) {
+    developersIds = developersIds.map(el => {
+        return new mongoose.Types.ObjectId(el);
+    });
+
+    return new Promise((resolve, reject) => {
+        this.aggregate([
+            { "$match": { _id: { $in: developersIds } } },
+            { "$unwind": "$projects" },
+            { "$project": { "_id": 0, "projects._id": 1 } },
+            {
+                "$group": {
+                    "_id": 0,
+                    "projects": { "$push": "$projects._id" }
+                }
+            },
+            { "$project": { "_id": 0, "projects": 1 } },
+        ], function (err, res) {
+            if (err) reject(err);
+            if (res) {
+                resolve(res[0].projects);
+            } else {
+                resolve(null);
+            }
+        });
+    })
+})
 
 DevelopersSchema.static('addNewProjects', function (developerId, newProjects) {
     return this.updateOne(

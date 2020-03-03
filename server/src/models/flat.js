@@ -39,5 +39,10 @@ var DevelopersSchema = new Schema({
     },
 });
 
+DevelopersSchema.static('getFlatWithPag', function(query, page){
+    return this.find(query)
+    .skip(page * 20)
+    .limit(20);
+})
 
 module.exports = mongoose.model('flats', DevelopersSchema);

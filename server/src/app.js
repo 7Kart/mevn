@@ -25,7 +25,7 @@ mongoose.connection.on("connected", () => {
 
     app.listen(process.env.PORT || process.env.PORT, () => {
         console.log(`server start on port ${process.env.PORT}`);
-        cron.initCronJobs();
+        // cron.initCronJobs();
     });
 })
 

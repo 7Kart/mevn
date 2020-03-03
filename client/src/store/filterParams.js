@@ -16,6 +16,7 @@ export default {
 
     mutations:{
         setDeveloperFilter(state, payload){
+            console.log('payload', payload)
             state.developerFilter = payload.developerFilter;
             state.projectFilter = payload.projectFilter;
             state.areaRange = payload.areaRange;
@@ -24,7 +25,7 @@ export default {
     },
 
     actions:{
-        setDeveloperFilter({commit}, payload){            
+        setDeveloperFilter({commit}, payload){   
             commit("setDeveloperFilter", payload);
         }
     },
@@ -44,8 +45,8 @@ export default {
         },
         getAllFilterValues: state => {
             return {
-                projectsIds: state.projectFilter,
-                developersIds: state.developerFilter,
+                projectFilter: state.projectFilter,
+                developerFilter: state.developerFilter,
                 areaRange: state.areaRange,
                 roomCountRange: state.roomCountRange
             }
