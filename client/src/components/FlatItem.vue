@@ -12,9 +12,9 @@
         <div>Сдача: {{getYear(flatValue.dateFinished)}}</div>
       </v-card-text>
       <v-card-actions>
-        <v-btn text>Share</v-btn>
+        <v-btn text @click="vk(flatValue.href)">Share</v-btn>
 
-        <v-btn color="purple" text>Explore</v-btn>
+        <v-btn color="purple" title="перейти на сайт застройщика" text @click="toOriginalSite(flatValue.href)">Подробнее</v-btn>
 
         <v-spacer></v-spacer>
 
@@ -72,7 +72,13 @@ export default {
   methods: {
     getYear(date) {
       return `${new Date(date).getFullYear()} г.`;
-    }    
+    },
+    toOriginalSite(link) {
+      window.open(link, "_blank");
+    },
+    vk(link){
+      window.open(`http://vkontakte.ru/share.php?url=${link}`, "_blank")
+    }
   }
 };
 </script>

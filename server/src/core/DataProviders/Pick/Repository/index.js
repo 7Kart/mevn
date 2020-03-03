@@ -62,8 +62,7 @@ exports.findNewProjects = async () => {
                                     idOrigin: pickProject.id
                                 });
                             }
-                        });
-                        console.log('here');
+                        });                       
                         let update = null;
                         try {
                             update = await Developer.addNewProjects(developer[0]._id, newProjects);
