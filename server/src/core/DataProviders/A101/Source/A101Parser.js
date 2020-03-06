@@ -42,9 +42,12 @@ function ParseFlatsList(query) {
             linksListDom.each((ind, divRoom) => {
                 let flat = new A101Flat();
                 const linkDom = $(divRoom).children('a')[0];
-                flat.href = linkDom.attribs.href;
-                if (flat.href) {
-                    flat.idOrigin = getNumbers(flat.href);
+                
+                const htmlHref = linkDom.attribs.href;
+                flat.href = `${BASE_URL}${htmlHref}`;               
+
+                if (htmlHref) {
+                    flat.idOrigin = getNumbers(htmlHref);
                 }
                 let linksDivsInfo = $(linkDom).children();             
 
