@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 var Schema = mongoose.Schema;
 
-var DevelopersSchema = new Schema({
+var FlatSchema = new Schema({
     _id: Schema.Types.ObjectId,
     imgSrc: String,
     roomsCount: Number,
@@ -29,6 +29,7 @@ var DevelopersSchema = new Schema({
     business: Boolean,
     projectId: Schema.Types.ObjectId,
     changes: [Object],
+    dtCheck: Date,
     block: {
         type: Boolean,
         default: false
@@ -39,10 +40,14 @@ var DevelopersSchema = new Schema({
     },
 });
 
-DevelopersSchema.static('getFlatWithPag', function(query, page){
+FlatSchema.static('getFlatWithPag', function(query, page){
     return this.find(query)
     .skip(page * 20)
     .limit(20);
+});
+
+FlatSchema.static('updateDtCheck', function(flatIds, dtCheck){
+    return this.updateMany({_ids:{$in:flatIds}}, {dtCheck:dtCheck})
 })
 
-module.exports = mongoose.model('flats', DevelopersSchema);
+module.exports = mongoose.model('flats', FlatSchema);

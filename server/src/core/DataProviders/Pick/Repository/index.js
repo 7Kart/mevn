@@ -119,11 +119,13 @@ exports.getNewPickFlats = async () => {
                             });
                             const dbFlats = await DbFlat.find({ idOrigin: { $in: flatsIdOrigin }, projectId: dbProject._id })
 
-                            updatePromiseArray = [];
-                            newFlatsToAdd = [];
+                            let updatePromiseArray = [];
+                            let newFlatsToAdd = [];
+                            let updateDtCheckIds = [];
 
                             webFlats.flats.forEach((flat) => {
                                 let webFlat = new PickFlat(flat, dbProject._id);
+                                webFlat.dtCheck = requestDate;
 
                                 let dbFlat = dbFlats.find((dbFlat) => {
                                     return dbFlat.idOrigin == webFlat.idOrigin;
@@ -138,10 +140,19 @@ exports.getNewPickFlats = async () => {
                                         }
                                         changes.old['dtChanges'] = requestDate; //date of request start.   
                                         dbFlat.changes.push(changes.old);
+                                        dbFlat.dtCheck = requestDate
                                         updatePromiseArray.push(dbFlat.save());
+                                    }else{
+                                        updateDtCheckIds.push(dbFlat._id);
                                     }
                                 } else {
                                     newFlatsToAdd.push(webFlat);
+                                }
+                            });
+
+                            DbFlat.updateDtCheck(updateDtCheckIds, requestDate).exec((err)=>{
+                                if(err){
+                                    console.log("update dtCheck error!")  
                                 }
                             });
 

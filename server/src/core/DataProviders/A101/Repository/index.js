@@ -30,7 +30,7 @@ exports.getNewDevelopersProject = function () {
     });
 }
 
-exports.getFlatsByParams = function(queryParams){
+exports.getFlatsByParams = function (queryParams) {
     return A101Parser.getRoomsData(queryParams);
 }
 
@@ -88,17 +88,18 @@ exports.findNewFlats = async function () {
 
             var newFlatArray = [];
             var editDbPromises = [];
+            var unchangedFlat = [];
 
             for (let flat of flats) {
                 console.log('flat', param.offset);
                 let dbFlat;
                 try {
-                    dbFlat = await Flat.findOne({ "idOrigin": flat.idOrigin, "projectId": project._id});
+                    dbFlat = await Flat.findOne({ "idOrigin": flat.idOrigin, "projectId": project._id });
                 } catch (e) {
                     throw e;
                 }
                 if (dbFlat) {
-                    //if object is empty                    
+                    //if db is exist                
                     const changes = flat.compareWithDbEntity(dbFlat)
 
                     if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
@@ -107,15 +108,23 @@ exports.findNewFlats = async function () {
                         }
                         changes.old['dtChanges'] = requestDate; //date of request start.   
                         dbFlat.changes.push(changes.old);
+                        dbFlat.dtCheck = requestDate;
                         editDbPromises.push(dbFlat.save());
+                    } else {
+                        unchangedFlat.push(dbFlat._id);
                     }
                 } else {
-                    //if there is changes    
+                    //if there is not flats in db    
                     flat.dateInsert = requestDate;   //date of request start.              
                     flat.projectId = project._id;
+                    flat.dtCheck = requestDate;
                     newFlatArray.push(new Flat(flat));
                 }
             }
+
+            Flat.updateDtCheck(unchangedFlat, requestDate).exec((err) => {
+                if (err) console.log('err when updatre unchange flat', err);
+            });
 
             if (newFlatArray.length > 0) {
                 editDbPromises.push(Flat.insertMany(newFlatArray));

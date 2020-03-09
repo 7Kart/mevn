@@ -26,10 +26,12 @@ module.exports = class Flat {
         this.business = null;
         this.block = false;
         this.projectId = null;
+        this.dtCheck = null;
     }
 
     compareWithDbEntity(dbFlat) {
-        const ignorFields = ["projectId", "district"];
+        
+        const ignorFields = ["projectId", "district", "dtCheck"];
         
         var difference = {
             new: {},

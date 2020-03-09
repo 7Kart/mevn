@@ -3,7 +3,7 @@
     <v-card class="overflow-hidden">
       <v-app-bar
         :collapse="false"
-        :collapse-on-scroll="true"
+        :collapse-on-scroll="false"
         color="default"
         dark
         :dense="true"
