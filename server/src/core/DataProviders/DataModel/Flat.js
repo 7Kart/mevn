@@ -42,7 +42,8 @@ module.exports = class Flat {
             if (this.hasOwnProperty(key) && ignorFields.indexOf(key) < 0) {
                 if (this[key] instanceof Date) {
                     if (this[key].getTime() != dbFlat[key].getTime()) {
-                        difference[key] = dbFlat[key];
+                        difference.new[key] = this[key];
+                        difference.new[key] = dbFlat[key];
                     }
                 } else {    
                     if (this[key] != dbFlat[key]) {

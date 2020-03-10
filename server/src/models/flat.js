@@ -47,7 +47,7 @@ FlatSchema.static('getFlatWithPag', function(query, page){
 });
 
 FlatSchema.static('updateDtCheck', function(flatIds, dtCheck){
-    return this.updateMany({_ids:{$in:flatIds}}, {dtCheck:dtCheck})
+    return this.updateMany({_id:{$in:flatIds}}, {dtCheck:dtCheck})
 })
 
 module.exports = mongoose.model('flats', FlatSchema);

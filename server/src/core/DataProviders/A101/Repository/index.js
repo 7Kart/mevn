@@ -86,62 +86,66 @@ exports.findNewFlats = async function () {
                 throw new Error('error until get flats from website')
             }
 
-            var newFlatArray = [];
-            var editDbPromises = [];
-            var unchangedFlat = [];
-
-            for (let flat of flats) {
-                console.log('flat', param.offset);
-                let dbFlat;
+            if (flats && flats.length > 0) {
+                
+                var newFlatsToAdd = [];
+                var updateDtCheckIds = [];
+                
+                webFlatsIds = flats.map(flat => {
+                    return flat.idOrigin;
+                });
+           
                 try {
-                    dbFlat = await Flat.findOne({ "idOrigin": flat.idOrigin, "projectId": project._id });
+                    var dbFlats = await Flat.find({ idOrigin: { $in: webFlatsIds }, projectId: project._id });
                 } catch (e) {
-                    throw e;
+                    console.log("can't get flats from db");
                 }
-                if (dbFlat) {
-                    //if db is exist                
-                    const changes = flat.compareWithDbEntity(dbFlat)
 
-                    if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
-                        for (key in changes.new) {
-                            dbFlat[key] = changes.new[key]
+                flats.forEach(webFlat => {
+                    let dbFlat = dbFlats.find(dbFlat => {
+                        return dbFlat.idOrigin == webFlat.idOrigin;
+                    });
+                    if (dbFlat) {
+                        
+                        const changes = webFlat.compareWithDbEntity(dbFlat);
+   
+                        if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
+                            for (key in changes.new) {
+                                dbFlat[key] = changes.new[key]
+                            }
+                            changes.old['dtChanges'] = requestDate; //date of request start.   
+                            dbFlat.changes.push(changes.old);
+                            dbFlat.dtCheck = requestDate
+                            dbFlat.save(err => {
+                                if (!err) {
+                                    stats.update++;
+                                }
+                            });
+                        } else {
+                            updateDtCheckIds.push(dbFlat._id);
                         }
-                        changes.old['dtChanges'] = requestDate; //date of request start.   
-                        dbFlat.changes.push(changes.old);
-                        dbFlat.dtCheck = requestDate;
-                        editDbPromises.push(dbFlat.save());
                     } else {
-                        unchangedFlat.push(dbFlat._id);
-                    }
-                } else {
-                    //if there is not flats in db    
-                    flat.dateInsert = requestDate;   //date of request start.              
-                    flat.projectId = project._id;
-                    flat.dtCheck = requestDate;
-                    newFlatArray.push(new Flat(flat));
-                }
-            }
-
-            Flat.updateDtCheck(unchangedFlat, requestDate).exec((err) => {
-                if (err) console.log('err when updatre unchange flat', err);
-            });
-
-            if (newFlatArray.length > 0) {
-                editDbPromises.push(Flat.insertMany(newFlatArray));
-            }
-
-            await Promise.all(editDbPromises).then((changes) => {
-                changes.forEach(change => {
-                    if (Array.isArray(change)) {
-                        stats.add = change.length
-                    } else {
-                        stats.update += 1;
+                        webFlat.dtCheck = requestDate;
+                        newFlatsToAdd.push(webFlat)
                     }
                 });
-                console.log('changes', stats);
-            });
+
+                Flat.updateDtCheck(updateDtCheckIds, requestDate).exec((err) => {
+                    if (err) console.log('err when updatre unchange flat', err);
+                });
+
+                if (newFlatsToAdd.length > 0) {
+                    Flat.insertMany(newFlatsToAdd, (err, insertedFlats) => {
+                        if (err) throw err;
+                        else
+                            stats.add += insertedFlats.length
+                    });
+                }
+
+            }
         }
     }
+    console.log('stats', stats);
     return stats;
 }
 

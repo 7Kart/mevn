@@ -62,7 +62,7 @@ exports.findNewProjects = async () => {
                                     idOrigin: pickProject.id
                                 });
                             }
-                        });                       
+                        });
                         let update = null;
                         try {
                             update = await Developer.addNewProjects(developer[0]._id, newProjects);
@@ -99,7 +99,7 @@ exports.getNewPickFlats = async () => {
             update: 0,
             add: 0,
             date: requestDate
-        } 
+        }
         if (developer) {
             for (let dbProject of developer.projects) {
                 try {
@@ -119,7 +119,6 @@ exports.getNewPickFlats = async () => {
                             });
                             const dbFlats = await DbFlat.find({ idOrigin: { $in: flatsIdOrigin }, projectId: dbProject._id })
 
-                            let updatePromiseArray = [];
                             let newFlatsToAdd = [];
                             let updateDtCheckIds = [];
 
@@ -133,7 +132,7 @@ exports.getNewPickFlats = async () => {
 
                                 if (dbFlat) {
                                     const changes = webFlat.compareWithDbEntity(dbFlat);
-                                    
+
                                     if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
                                         for (key in changes.new) {
                                             dbFlat[key] = changes.new[key]
@@ -141,8 +140,13 @@ exports.getNewPickFlats = async () => {
                                         changes.old['dtChanges'] = requestDate; //date of request start.   
                                         dbFlat.changes.push(changes.old);
                                         dbFlat.dtCheck = requestDate
-                                        updatePromiseArray.push(dbFlat.save());
-                                    }else{
+                                        dbFlat.save(err=>{
+                                            if(!err){
+                                                status.update++;
+                                            }
+                                        })
+
+                                    } else {
                                         updateDtCheckIds.push(dbFlat._id);
                                     }
                                 } else {
@@ -150,24 +154,20 @@ exports.getNewPickFlats = async () => {
                                 }
                             });
 
-                            DbFlat.updateDtCheck(updateDtCheckIds, requestDate).exec((err)=>{
-                                if(err){
-                                    console.log("update dtCheck error!")  
+                            DbFlat.updateDtCheck(updateDtCheckIds, requestDate).exec((err) => {
+                                if (err) {
+                                    console.log("update dtCheck error!")
                                 }
                             });
 
                             if (newFlatsToAdd.length > 0) {
-                                let insertedFlats = null;
-                                try{
-                                    insertedFlats = await DbFlat.insertMany(newFlatsToAdd);
-                                }catch(e){
-                                    throw e;
-                                }
-                                status.add += insertedFlats.length
+                                DbFlat.insertMany(newFlatsToAdd, (err, insertedFlats) => {
+                                    if (err) throw err;
+                                    else
+                                        status.add += insertedFlats.length
+                                });
                             }
-                            let result = await Promise.all(updatePromiseArray)                            
-                            status.update += result.length;
-                            
+
                             startPage++;
                         } else {
                             webQueryFinishFlag = true;
@@ -177,6 +177,7 @@ exports.getNewPickFlats = async () => {
                     throw e;
                 }
             }
+
             return status
         } else {
             throw new Error("developer is not found")

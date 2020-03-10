@@ -32,4 +32,21 @@ exports.GetFlats = async (req, res, next) => {
     catch (e) {
         next(e);
     }
-} 
+}
+
+
+exports.FindDeletedFlats = async (req, res, next) => {
+    console.log('here');
+
+
+    Flat.updateMany({
+        'dtCheck': {
+            '$exists': 0
+        }
+    }, {$set : {"dtCheck":null}}).exec()
+
+    res.send({
+        status: 200
+    })
+
+}
