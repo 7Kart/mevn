@@ -1,7 +1,7 @@
 const Flat = require("../models/flat"),
     Developers = require("../models/developer"),
     a1010Parser = require("../core/DataProviders/A101/Source/A101Parser");
-    
+
 
 
 exports.UpdateMongoFlats = async (req, res) => {
@@ -36,15 +36,23 @@ exports.GetFlats = async (req, res, next) => {
     }
 }
 
-
+//find flats which was sold
 exports.FindDeletedFlats = async (req, res, next) => {
-    console.log('here');
-    const saleStatus = await a1010Parser.getSaleStatus("https://a101.ru/kvartiry/31107/")
 
-    console.log(`test ${saleStatus}`);
-    
+    const dbFlats = await Flat.find({ projectId: "5e249bd51335fa000067e080" })
+        .skip(0)
+        .limit(50);
+
+    let promiseArray = []
+
+    dbFlats.forEach(flat => {
+        promiseArray.push(a1010Parser.getSaleStatus(flat))
+    });
+
+    var result = await Promise.all(promiseArray);
+
     res.send({
-        status: 200
-    })
+        status: result
+    });
 
 }
