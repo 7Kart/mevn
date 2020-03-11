@@ -10,6 +10,7 @@ router.get('/ParceAllA101Flats', a101Ctr.ParceAllA101Flats);
 router.get('/ParceAllA101FlatsAsync', a101Ctr.ParceAllA101FlatsAsync);
 router.get('/getNewDevelopersProjects', a101Ctr.getNewDevelopersProjects);
 router.get('/GetFlats', a101Ctr.GetFlats);
+router.get('/a101filterParams', a101Ctr.getA101FilterParams)
 
 // Pick developer
 router.get('/GetPickLocation', pickCtr.GetPickLocation);

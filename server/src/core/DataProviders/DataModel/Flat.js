@@ -1,4 +1,3 @@
-
 module.exports = class Flat {
     constructor() {
         this.imgSrc = null;
@@ -30,7 +29,7 @@ module.exports = class Flat {
     }
 
     compareWithDbEntity(dbFlat) {
-        
+      
         const ignorFields = ["projectId", "district", "dtCheck"];
         
         var difference = {

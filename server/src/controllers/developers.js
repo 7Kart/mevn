@@ -13,12 +13,11 @@ exports.getDevelopersProjects = async (req, res, next) => {
 
     let projects = [];
 
-    if(req.query.ids && req.query.ids.length > 0){
+    if (req.query.ids && req.query.ids.length > 0) {
         projects = await Developer.getDevelopersProjects(req.query.ids);
         projects = projects.length > 0 ? projects[0].projects : projects;
-    }       
-    
+    }
     res.json({
         projects: projects
-    }) 
+    })
 }

@@ -1,5 +1,7 @@
 const Flat = require("../models/flat"),
-    Developers = require("../models/developer");
+    Developers = require("../models/developer"),
+    a1010Parser = require("../core/DataProviders/A101/Source/A101Parser");
+    
 
 
 exports.UpdateMongoFlats = async (req, res) => {
@@ -37,14 +39,10 @@ exports.GetFlats = async (req, res, next) => {
 
 exports.FindDeletedFlats = async (req, res, next) => {
     console.log('here');
+    const saleStatus = await a1010Parser.getSaleStatus("https://a101.ru/kvartiry/31107/")
 
-
-    Flat.updateMany({
-        'dtCheck': {
-            '$exists': 0
-        }
-    }, {$set : {"dtCheck":null}}).exec()
-
+    console.log(`test ${saleStatus}`);
+    
     res.send({
         status: 200
     })

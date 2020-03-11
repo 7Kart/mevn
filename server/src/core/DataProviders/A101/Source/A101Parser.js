@@ -1,6 +1,5 @@
 const needle = require('needle'),
     cheerio = require("cheerio"),
-    https = require('https'),
     A101Flat = require("../../DataModel/A101Flat"),
     urlUtils = require('../../../urlUtils');
 
@@ -8,6 +7,7 @@ const BASE_URL = "https://a101.ru"
 
 exports.getRoomsData = ParseFlatsList;
 exports.getFilterParams = getFilterParams;
+exports.getSaleStatus = GetSaleStatus;
 
 //parse flats from list https://a101.ru/kvartiry/?group=0&complex=17
 function ParseFlatsList(query) {
@@ -33,7 +33,7 @@ function ParseFlatsList(query) {
                     normalizeWhitespace: true,
                 });
             }
-            catch (e) {                
+            catch (e) {
                 reject(e)
             }
 
@@ -42,14 +42,14 @@ function ParseFlatsList(query) {
             linksListDom.each((ind, divRoom) => {
                 let flat = new A101Flat();
                 const linkDom = $(divRoom).children('a')[0];
-                
+
                 const htmlHref = linkDom.attribs.href;
-                flat.href = `${BASE_URL}${htmlHref}`;               
+                flat.href = `${BASE_URL}${htmlHref}`;
 
                 if (htmlHref) {
                     flat.idOrigin = getNumbers(htmlHref);
                 }
-                let linksDivsInfo = $(linkDom).children();             
+                let linksDivsInfo = $(linkDom).children();
 
                 linksDivsInfo.each((ind, divDom) => {
                     if (ind == 0) {
@@ -99,7 +99,7 @@ function ParseFlatsList(query) {
                 let blockEl = $(divRoom).find(`.flat-card__status`);
                 //reservation flat 
                 flat.block = blockEl.length > 0;
-                
+
                 flats.push(flat);
             });
             return resolve(flats);
@@ -110,49 +110,40 @@ function ParseFlatsList(query) {
 //get all params value for https://a101.ru/objects query
 function getFilterParams(query) {
     const params = urlUtils.queryToString(query);
+
     return new Promise((resolve, reject) => {
-        https.get(`${BASE_URL}/objects/filter/facets/${params}`, (resp) => {
-            let data = '';
+        needle.get(`${BASE_URL}/objects/filter/facets/${params}`, (err, response) => {
+            if (err) reject(err);
+            let filterData = response.body
 
-            resp.on('data', (chunk) => {
-                data += chunk;
-            });
-
-            resp.on('end', () => {
-                let filterData = JSON.parse(data)
-                var complexNameUrl = `${BASE_URL}/objects/filter/applied/?group=0`
-                if (filterData) {
-                    filterData.facets.complex.forEach(complexId => {
-                        complexNameUrl += `&complex=${complexId}`
-                    });
-
-                    https.get(complexNameUrl, (resp) => {
-                        let data = '';
-
-                        resp.on('data', (chunk) => {
-                            data += chunk;
-                        });
-
-                        resp.on('end', (req, res) => {
-                            filterData.facets["complexNames"] = JSON.parse(data).complex ? JSON.parse(data).complex.split(", ") : JSON.parse(data).complex.split(", ")
-                            
-                            resolve(filterData);
-                        })
-
-                        resp.on('error', (err) => {
-                            resolve(filterData);
-                        });
-                    })
-                }
-            });
-
-            resp.on("error", (err) => {
-                reject(err);
-            });
-        }).on("error", (err) => {
-            reject(err);
+            var complexNameUrl = `${BASE_URL}/objects/filter/applied/?group=0`
+            if (filterData) {
+                filterData.facets.complex.forEach(complexId => {
+                    complexNameUrl += `&complex=${complexId}`
+                });
+                needle.get(complexNameUrl, (err, response) => {
+                    if (err) reject(err);
+                    filterData.facets["complexNames"] = response.body.complex ? response.body.complex.split(", ") : response.body.complex.split(", ")
+                    resolve(filterData);
+                });
+            }
         });
     });
+}
+
+//get flat page and watch title
+async function GetSaleStatus(link) {
+    let res = null
+    try {
+        const flatHtmlPage = await needle("get", link);
+        $ = cheerio.load(flatHtmlPage.body, {
+            normalizeWhitespace: true,
+        });
+        const title = $('title').text();
+        return title.trim().toLowerCase() == "квартира продана";
+    } catch (e) {
+        return null
+    }
 }
 
 //parse floor div
@@ -167,9 +158,9 @@ function parceFloor(textValue) {
 }
 
 //
-function parceFloarFromStr(str){    
-    return parseFloat(str.replace(",","."))
-} 
+function parceFloarFromStr(str) {
+    return parseFloat(str.replace(",", "."))
+}
 
 //convert dateformat 'mmmm YYYYY г.' в new Date()
 function convertDate(textValue) {
