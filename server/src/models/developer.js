@@ -5,6 +5,7 @@ var Schema = mongoose.Schema;
 var DevelopersSchema = new Schema({
     _id: mongoose.Types.ObjectId,
     name: String,
+    code: String,
     projects: {
         type: [{
             _id: mongoose.Types.ObjectId,

@@ -1,5 +1,6 @@
 const Flat = require("../models/flat"),
     Developers = require("../models/developer"),
+    CommonRepository = require('../core/DataProviders/Common'),
     a1010Parser = require("../core/DataProviders/A101/Source/A101Parser");
 
 
@@ -39,20 +40,16 @@ exports.GetFlats = async (req, res, next) => {
 //find flats which was sold
 exports.FindDeletedFlats = async (req, res, next) => {
 
-    const dbFlats = await Flat.find({ projectId: "5e249bd51335fa000067e080" })
-        .skip(0)
-        .limit(50);
-
-    let promiseArray = []
-
-    dbFlats.forEach(flat => {
-        promiseArray.push(a1010Parser.getSaleStatus(flat))
-    });
-
-    var result = await Promise.all(promiseArray);
+    CommonRepository.checkSoldFlats().then((data)=>{
+        console.log(`data`,data);        
+    })
+    .catch((err)=>{
+        console.log(`err ${err}`);
+        
+    })
 
     res.send({
-        status: result
+        status: 200
     });
 
 }
