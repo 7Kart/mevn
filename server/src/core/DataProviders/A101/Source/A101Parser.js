@@ -135,12 +135,12 @@ function getFilterParams(query) {
 function GetSaleStatus(flat) {
     return new Promise(async (resolve, reject) => {
         needle.get(flat.href, (err, flatHtmlPage) => {
-            if(err) reject(err);
+            if (err) reject(err);
             $ = cheerio.load(flatHtmlPage.body, {
                 normalizeWhitespace: true,
             });
             const title = $('title').text();
-                        
+
             resolve({
                 status: title.trim().toLowerCase() == "квартира продана",
                 idFlat: flat._id
