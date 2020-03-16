@@ -22,7 +22,7 @@ exports.checkSoldFlats = () => {
                     let limit = 100
                     do {
                         [err, flats] = await to(Flat.find({ projectId: project._id },
-                            { _id: 1, district: 1, idOrigin: 1, projectId: 1 })
+                            { _id: 1, district: 1, idOrigin: 1, projectId: 1, href: 1 })
                             .skip(skip)
                             .limit(limit));
                         if (err) {
@@ -32,7 +32,7 @@ exports.checkSoldFlats = () => {
                             skip += limit;
                             flats.forEach(async (flat) => {
                                 // var test = await checkSoldStatus(developers[0].code, flat)
-                                var test = checkSoldStatus(developers[0].code, flat)
+                                [err, test] = await to(checkSoldStatus(developers[0].code, flat))
 
                                 console.log('test', test);
 
@@ -50,10 +50,9 @@ exports.checkSoldFlats = () => {
 }
 
 function checkSoldStatus(code, flat) {
-    console.log(code, flat) 
-    // if (code === "a101") {
-    //     return A101Parser.getSaleStatus(flat);
-    // }
+    if (code === "a101") {
+        A101Parser.getSaleStatus(flat);
+    }
     return null
 
 }
