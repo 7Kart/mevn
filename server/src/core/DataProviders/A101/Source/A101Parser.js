@@ -19,7 +19,8 @@ function ParseFlatsList(query) {
 
         // var URL = `www.sd.net/objects/filter/${params}`;
         needle.get(URL, {
-            open_timeout: 10000
+            open_timeout: 10000,
+            rejectUnauthorized: false
         }, (err, res) => {
             //bug (when internet is slow and pages get async)           
             if (err) {
@@ -112,7 +113,7 @@ function getFilterParams(query) {
     const params = urlUtils.queryToString(query);
 
     return new Promise((resolve, reject) => {
-        needle.get(`${BASE_URL}/objects/filter/facets/${params}`, (err, response) => {
+        needle.get(`${BASE_URL}/objects/filter/facets/${params}`, { rejectUnauthorized: false }, (err, response) => {
             if (err) reject(err);
             let filterData = response.body
 
@@ -121,7 +122,9 @@ function getFilterParams(query) {
                 filterData.facets.complex.forEach(complexId => {
                     complexNameUrl += `&complex=${complexId}`
                 });
-                needle.get(complexNameUrl, (err, response) => {
+                needle.get(complexNameUrl, {
+                    rejectUnauthorized: false
+                }, (err, response) => {
                     if (err) reject(err);
                     filterData.facets["complexNames"] = response.body.complex ? response.body.complex.split(", ") : response.body.complex.split(", ")
                     resolve(filterData);
@@ -135,9 +138,11 @@ function getFilterParams(query) {
 function GetSaleStatus(flat) {
     return new Promise(async (resolve, reject) => {
         try {
-            needle.get(flat.href, (err, flatHtmlPage) => {
+            needle.get(flat.href, {
+                rejectUnauthorized: false
+            }, (err, flatHtmlPage) => {
                 if (err) {
-                    reject(err)
+                    throw (err)
                 };
                 $ = cheerio.load(flatHtmlPage.body, {
                     normalizeWhitespace: true,

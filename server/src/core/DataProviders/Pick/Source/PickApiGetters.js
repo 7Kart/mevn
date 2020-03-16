@@ -23,6 +23,13 @@ exports.getPickFlats = (queryParams) => {
     return needle('get', `https://api.pik.ru/v2/flat${queryString}`);
 }
 
+//GET PICK FLAT INFO
+//id, similar
+exports.getPickFlatById = (queryParams) => {
+    const queryString = urlUtils.queryToString(queryParams)
+    return needle('get', `https://api.pik.ru/v1/flat${queryString}`);
+}
+
 //GET PICK BLOKCS
 //https://api.pik.ru/v1/block?
 //types=1,2&metadata=1&statistics=1&images=1&locations=2,3&price_from=undefined

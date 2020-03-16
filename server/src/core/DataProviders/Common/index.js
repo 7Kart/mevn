@@ -16,7 +16,6 @@ exports.checkSoldFlats = () => {
             if (developers.length > 0) {
 
                 const devPromise = developers[0].projects.map(async (project) => {
-
                     let flats = []
                     let skip = 0;
                     let limit = 100
@@ -26,17 +25,15 @@ exports.checkSoldFlats = () => {
                             .skip(skip)
                             .limit(limit));
                         if (err) {
-                            console.log('flats find error')
                             flats = [];
                         } else {
                             skip += limit;
-                            flats.forEach(async (flat) => {
-                                // var test = await checkSoldStatus(developers[0].code, flat)
-                                [err, test] = await to(checkSoldStatus(developers[0].code, flat))
-
-                                console.log('test', test);
-
+                            flatpromise = flats.map(async (flat, index) => {
+                                [err, flatStatus] = await to(checkSoldStatus(developers[0].code, flat))
+                                return flatStatus
                             });
+                            const test = await Promise.all(flatpromise)
+                            console.log('test', test);
                         }
                     } while (flats && flats.length != 0)
                 });
@@ -51,8 +48,7 @@ exports.checkSoldFlats = () => {
 
 function checkSoldStatus(code, flat) {
     if (code === "a101") {
-        A101Parser.getSaleStatus(flat);
+        return A101Parser.getSaleStatus(flat);
     }
-    return null
-
+    return Promise.resolve([null, null])
 }
