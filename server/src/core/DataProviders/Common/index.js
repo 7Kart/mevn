@@ -1,6 +1,7 @@
 const Flat = require("../../../models/flat"),
     Developer = require("../../../models/developer"),
-    A101Parser = require("../A101/Source/A101Parser")
+    A101Parser = require("../A101/Source/A101Parser"),
+    PickAPI = require("../Pick/Source/PickApiGetters")
 to = require('await-to-js').default;
 
 exports.checkSoldFlats = () => {
@@ -10,38 +11,74 @@ exports.checkSoldFlats = () => {
         [err, developerCount] = await to(Developer.count());
         if (err) reject(err)
 
-        for (var dInd = 0; dInd < developerCount; dInd++) {
+        for (var dInd = 1; dInd < developerCount; dInd++) {
             [err, developers] = await to(Developer.find().skip(dInd).limit(1))
-            if (err) reject(err);
             if (developers.length > 0) {
-
-                const devPromise = developers[0].projects.map(async (project) => {
+                for (let project of developers[0].projects) {
                     let flats = []
                     let skip = 0;
-                    let limit = 100
+                    let limit = 1;
+
                     do {
                         [err, flats] = await to(Flat.find({ projectId: project._id },
                             { _id: 1, district: 1, idOrigin: 1, projectId: 1, href: 1 })
                             .skip(skip)
                             .limit(limit));
-                        if (err) {
-                            flats = [];
-                        } else {
-                            skip += limit;
-                            flatpromise = flats.map(async (flat, index) => {
-                                [err, flatStatus] = await to(checkSoldStatus(developers[0].code, flat))
-                                return flatStatus
-                            });
-                            const test = await Promise.all(flatpromise)
-                            console.log('test', test);
-                        }
+
+                        skip += limit;
+
+                        let prom = flats.map(async (flat) => {
+                            [err, flatStatus] = await to(checkSoldStatus(developers[0].code, flat))
+                            return flatStatus
+                        })
+
+                        let res = await Promise.all(prom)
+
+                        console.log('res', res);
+                        
+
                     } while (flats && flats.length != 0)
-                });
 
-                result = await Promise.all(devPromise)
-
+                }
             }
+            console.log('go to another developer')
+
         }
+
+
+
+
+
+        // for (var dInd = 0; dInd < developerCount; dInd++) {
+        //     [err, developers] = await to(Developer.find().skip(dInd).limit(1))
+        //     if (err) reject(err);
+        //     if (developers.length > 0) {
+
+        //         const devPromise = developers[0].projects.map(async (project) => {
+        //             let flats = []
+        //             let skip = 0;
+        //             let limit = 100
+        //             do {
+        //                 [err, flats] = await to(Flat.find({ projectId: project._id },
+        //                     { _id: 1, district: 1, idOrigin: 1, projectId: 1, href: 1 })
+        //                     .skip(skip)
+        //                     .limit(limit));
+        //                 if (err) {
+        //                     flats = [];
+        //                 } else {
+        //                     skip += limit;
+        //                     flatpromise = flats.map(async (flat, index) => {
+        //                         [err, flatStatus] = await to(checkSoldStatus(developers[0].code, flat))
+        //                         return flatStatus
+        //                     });
+        //                     const test = await Promise.all(flatpromise)
+        //                 }
+        //             } while (flats && flats.length != 0)
+        //         });
+
+        //         result = await Promise.all(devPromise)
+        //     }
+        // }
 
     });
 }
@@ -49,6 +86,8 @@ exports.checkSoldFlats = () => {
 function checkSoldStatus(code, flat) {
     if (code === "a101") {
         return A101Parser.getSaleStatus(flat);
+    } else if (code === "pick") {
+        return PickAPI.GetSaleStatus(flat)
     }
     return Promise.resolve([null, null])
 }

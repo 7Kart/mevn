@@ -25,10 +25,33 @@ exports.getPickFlats = (queryParams) => {
 
 //GET PICK FLAT INFO
 //id, similar
+//{"error":"ERR_FLAT_NOT_FOUND"} 
 exports.getPickFlatById = (queryParams) => {
     const queryString = urlUtils.queryToString(queryParams)
     return needle('get', `https://api.pik.ru/v1/flat${queryString}`);
 }
+
+//GET PICK FLAT SALE STATUS
+//id, 
+//{"error":"ERR_FLAT_NOT_FOUND"} 
+exports.GetSaleStatus = (flat) => {
+    return new Promise((resolve, reject) => {
+        try {
+            needle.get(`https://api.pik.ru/v1/flat?id=${flat.idOrigin}`, (err, res) => {
+                if (err) throw(err);                
+                resolve({
+                    status: (res.body && res.body.error === "ERR_FLAT_NOT_FOUND") ? true : false,
+                    idFlat: flat._id,
+                    href: flat.href
+                });
+
+            });
+        } catch (err) {
+            reject(err)
+        }
+    });
+}
+
 
 //GET PICK BLOKCS
 //https://api.pik.ru/v1/block?

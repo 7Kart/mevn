@@ -137,26 +137,41 @@ function getFilterParams(query) {
 //get flat page and watch title
 function GetSaleStatus(flat) {
     return new Promise(async (resolve, reject) => {
-        try {
-            needle.get(flat.href, {
-                rejectUnauthorized: false
-            }, (err, flatHtmlPage) => {
-                if (err) {
-                    throw (err)
-                };
-                $ = cheerio.load(flatHtmlPage.body, {
+
+        var stream = needle.get(flat.href, {
+            compressed: true,
+            follow_max: 5,
+            rejectUnauthorized: false
+        });
+
+        let title = null;
+
+        stream.on('readable', function () {
+            while (data = this.read()) {
+                $ = cheerio.load(data.toString(), {
                     normalizeWhitespace: true,
                 });
-                const title = $('title').text();
+                title = $('title').text();
+                if (title) {
+                    this.destroy();
+                }
+            }
+        })
 
+        stream.on('close', function (err) {
+            if (title) {
                 resolve({
                     status: title.trim().toLowerCase() == "квартира продана",
                     idFlat: flat._id
                 });
-            });
-        } catch (err) {
-            reject(err);
-        }
+            } else {
+                resolve({
+                    status: false,
+                    idFlat: flat._id
+                });
+            }
+        })
+
     });
 }
 
