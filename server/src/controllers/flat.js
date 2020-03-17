@@ -43,6 +43,7 @@ exports.FindDeletedFlats = async (req, res, next) => {
     CommonRepository.checkSoldFlats().then((data)=>{
         console.log(`data`,data);        
     })
+
     .catch((err)=>{
         console.log(`err ${err}`);
         

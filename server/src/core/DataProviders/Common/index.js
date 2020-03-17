@@ -7,78 +7,50 @@ to = require('await-to-js').default;
 exports.checkSoldFlats = () => {
     return new Promise(async (resolve, reject) => {
         let err, developerCount, developers;
-        //get all developers
+        // get all developers
         [err, developerCount] = await to(Developer.count());
         if (err) reject(err)
 
-        for (var dInd = 1; dInd < developerCount; dInd++) {
+        var total = 0
+
+        for (var dInd = 0; dInd < 1; dInd++) {
             [err, developers] = await to(Developer.find().skip(dInd).limit(1))
             if (developers.length > 0) {
                 for (let project of developers[0].projects) {
-                    let flats = []
-                    let skip = 0;
-                    let limit = 1;
+                    [err, lastCheckDate] = await to(Flat.getLastCheckDate(project._id).exec());
+                    if (err) { reject(err) };
+                    if (lastCheckDate.length > 0) {
+                        const date = lastCheckDate[0].dtCheck;
+                        let flats, skip = 0, limit = 50;
+                        do {
+                            [err, flats] = await to(Flat.getNotCheckedFlats(project._id, date)
+                                .skip(skip)
+                                .limit(limit));
 
-                    do {
-                        [err, flats] = await to(Flat.find({ projectId: project._id },
-                            { _id: 1, district: 1, idOrigin: 1, projectId: 1, href: 1 })
-                            .skip(skip)
-                            .limit(limit));
+                            total += flats.length;
 
-                        skip += limit;
+                            // flatsPromise = flats.map((flat) => {
+                            //     return checkSoldStatus()
+                            // });
 
-                        let prom = flats.map(async (flat) => {
-                            [err, flatStatus] = await to(checkSoldStatus(developers[0].code, flat))
-                            return flatStatus
-                        })
+                            // let test = await Promise.all(flatsPromise)
 
-                        let res = await Promise.all(prom)
+                            // console.log('test', test);
 
-                        console.log('res', res);
-                        
+                            skip += limit;
 
-                    } while (flats && flats.length != 0)
+                        } while (flats && flats.length > 0)
 
+
+                        if (err) reject(err);
+
+                    }
                 }
             }
-            console.log('go to another developer')
-
+            console.log('go to another developer', total);
         }
 
 
-
-
-
-        // for (var dInd = 0; dInd < developerCount; dInd++) {
-        //     [err, developers] = await to(Developer.find().skip(dInd).limit(1))
-        //     if (err) reject(err);
-        //     if (developers.length > 0) {
-
-        //         const devPromise = developers[0].projects.map(async (project) => {
-        //             let flats = []
-        //             let skip = 0;
-        //             let limit = 100
-        //             do {
-        //                 [err, flats] = await to(Flat.find({ projectId: project._id },
-        //                     { _id: 1, district: 1, idOrigin: 1, projectId: 1, href: 1 })
-        //                     .skip(skip)
-        //                     .limit(limit));
-        //                 if (err) {
-        //                     flats = [];
-        //                 } else {
-        //                     skip += limit;
-        //                     flatpromise = flats.map(async (flat, index) => {
-        //                         [err, flatStatus] = await to(checkSoldStatus(developers[0].code, flat))
-        //                         return flatStatus
-        //                     });
-        //                     const test = await Promise.all(flatpromise)
-        //                 }
-        //             } while (flats && flats.length != 0)
-        //         });
-
-        //         result = await Promise.all(devPromise)
-        //     }
-        // }
 
     });
 }
