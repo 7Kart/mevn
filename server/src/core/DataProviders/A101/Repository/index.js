@@ -53,6 +53,8 @@ exports.findNewFlats = async function () {
         date: requestDate
     };
 
+    let TOTAL = 0
+
     for (project of dbDeveloper.projects) {
         let projectFilters = null;
         try {
@@ -87,7 +89,7 @@ exports.findNewFlats = async function () {
             }
 
             if (flats && flats.length > 0) {
-                
+                TOTAL += flats.length;
                 var newFlatsToAdd = [];
                 var updateDtCheckIds = [];
                 
@@ -144,6 +146,7 @@ exports.findNewFlats = async function () {
 
             }
         }
+        console.log('TOTAL!!!!!!', TOTAL)
     }
     console.log('stats', stats);
     return stats;

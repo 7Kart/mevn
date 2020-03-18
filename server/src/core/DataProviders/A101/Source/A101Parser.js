@@ -147,6 +147,7 @@ function GetSaleStatus(flat) {
         let title = null;
 
         stream.on('readable', function () {
+
             while (data = this.read()) {
                 $ = cheerio.load(data.toString(), {
                     normalizeWhitespace: true,
@@ -162,16 +163,33 @@ function GetSaleStatus(flat) {
             if (title) {
                 resolve({
                     status: title.trim().toLowerCase() == "квартира продана",
-                    idFlat: flat._id
+                    idFlat: flat._id,
+                    href: flat.href
                 });
             } else {
                 resolve({
                     status: false,
-                    idFlat: flat._id
+                    idFlat: flat._id,
+                    href: flat.href
                 });
             }
         })
 
+        stream.on('done', function (err) {
+            resolve({
+                status: false,
+                idFlat: flat._id,
+                href: flat.href
+            });
+        })
+        
+        stream.on('error', function (err) {
+            resolve({
+                status: false,
+                idFlat: flat._id,
+                href: flat.href
+            });
+        })
     });
 }
 

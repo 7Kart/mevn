@@ -38,7 +38,7 @@ exports.GetSaleStatus = (flat) => {
     return new Promise((resolve, reject) => {
         try {
             needle.get(`https://api.pik.ru/v1/flat?id=${flat.idOrigin}`, (err, res) => {
-                if (err) throw(err);                
+                if (err) throw (err);
                 resolve({
                     status: (res.body && res.body.error === "ERR_FLAT_NOT_FOUND") ? true : false,
                     idFlat: flat._id,

@@ -11,9 +11,7 @@ exports.checkSoldFlats = () => {
         [err, developerCount] = await to(Developer.count());
         if (err) reject(err)
 
-        var total = 0
-
-        for (var dInd = 0; dInd < 1; dInd++) {
+        for (var dInd = 0; dInd < developerCount; dInd++) {
             [err, developers] = await to(Developer.find().skip(dInd).limit(1))
             if (developers.length > 0) {
                 for (let project of developers[0].projects) {
@@ -21,33 +19,41 @@ exports.checkSoldFlats = () => {
                     if (err) { reject(err) };
                     if (lastCheckDate.length > 0) {
                         const date = lastCheckDate[0].dtCheck;
-                        let flats, skip = 0, limit = 50;
+                        let flats, skip = 0, limit = 10;
                         do {
                             [err, flats] = await to(Flat.getNotCheckedFlats(project._id, date)
                                 .skip(skip)
                                 .limit(limit));
+                            
+                            console.log('flats count', flats.length)
 
-                            total += flats.length;
+                            let flatsPromise = flats.map(async (flat) => {
+                                [err, status] = await to(checkSoldStatus(developers[0].code, flat))
+                                return status;
+                            });
 
-                            // flatsPromise = flats.map((flat) => {
-                            //     return checkSoldStatus()
-                            // });
+                            [err, soldStatus] = await to(Promise.all(flatsPromise))
+                            if (err) reject(err)
+                            if (soldStatus) {
+                                const soldFlatIds = soldStatus.reduce((curItem, item) => {
+                                    if (item.status == true) {
+                                        curItem.push(item.idFlat);
+                                    }
+                                    return curItem;
+                                }, []);
 
-                            // let test = await Promise.all(flatsPromise)
-
-                            // console.log('test', test);
-
+                                if(soldFlatIds.length > 0){
+                                    Flat.changeSaleStatus(soldFlatIds).exec();
+                                }
+                            }
                             skip += limit;
-
                         } while (flats && flats.length > 0)
 
 
                         if (err) reject(err);
-
                     }
                 }
             }
-            console.log('go to another developer', total);
         }
 
 
