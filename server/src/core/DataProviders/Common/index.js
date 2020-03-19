@@ -11,7 +11,7 @@ exports.checkSoldFlats = () => {
         [err, developerCount] = await to(Developer.count());
         if (err) reject(err)
 
-        for (var dInd = 0; dInd < developerCount; dInd++) {
+        for (var dInd = 0; dInd < 1; dInd++) {
             [err, developers] = await to(Developer.find().skip(dInd).limit(1))
             if (developers.length > 0) {
                 for (let project of developers[0].projects) {
@@ -22,9 +22,10 @@ exports.checkSoldFlats = () => {
                         let flats, skip = 0, limit = 10;
                         do {
                             [err, flats] = await to(Flat.getNotCheckedFlats(project._id, date)
+                                .sort({_id:1})
                                 .skip(skip)
                                 .limit(limit));
-                            console.log('!!!!', date)  
+                            console.log('!!!!', date, '--', project.name)  
                             console.log('flats count', flats)
 
                             // let flatsPromise = flats.map(async (flat) => {

@@ -58,7 +58,7 @@ FlatSchema.static('getLastCheckDate', function (projectId) {
     return this.find({ dtCheck: { $ne: null } }, { _id: 0, dtCheck: 1 }).sort({ dtCheck: -1 }).limit(1)
 });
 
-FlatSchema.static('changeSaleStatus', function(saleFlatIds){
+FlatSchema.static('changeSaleStatus', function (saleFlatIds) {
     return this.updateMany({ _id: { $in: saleFlatIds } }, { isSold: true })
 })
 
@@ -72,7 +72,7 @@ FlatSchema.static('getNotCheckedFlats', function (projectId, date) {
         projectId: projectId,
         isSold: false
     }, {
-        dtCheck: 1, 
+        dtCheck: 1,
         district: 1,
         href: 1,
         idOrigin: 1,
@@ -81,7 +81,12 @@ FlatSchema.static('getNotCheckedFlats', function (projectId, date) {
     })
 });
 
-
+FlatSchema.static("getFlatsByIdOrigAndProjectId", function (originIds, projectId) {
+    return this.find({
+        idOrigin: { $in: webFlatsIds },
+        projectId: project._id
+    });
+})
 
 
 module.exports = mongoose.model('flats', FlatSchema);

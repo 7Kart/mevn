@@ -1,7 +1,9 @@
 const mongoose = require('mongoose')
 const A101Parser = require("../Source/A101Parser"),
     Developer = require("../../../../models/developer"),
+    to = require('await-to-js').default,
     Flat = require("../../../../models/flat");
+
 
 exports.getFilterParams = getFilterParams;
 
@@ -36,14 +38,10 @@ exports.getFlatsByParams = function (queryParams) {
 
 //get all A101's flats by offset chunk
 exports.findNewFlats = async function () {
-    let dbDeveloper = null;
+    let err, dbDeveloper = null;
 
-    try {
-        dbDeveloper = await Developer.findOne({ "name": "A101" }, { "projects": true })
-    }
-    catch (err) {
-        throw new Error('get db project error');
-    }
+    [err, dbDeveloper] = await to(Developer.findOne({ "name": "A101" }, { "projects": true }));
+    if (err) throw new Error("can not get A101 developer");
 
     const requestDate = new Date();
 
@@ -53,103 +51,101 @@ exports.findNewFlats = async function () {
         date: requestDate
     };
 
-    let TOTAL = 0
-
     for (project of dbDeveloper.projects) {
         let projectFilters = null;
-        try {
-            projectFilters = await getFilterParams({ complex: project.idOrigin });
-        } catch (err) {
-            throw new Error('get site filter error');
-        }
+
+        [err, projectFilters] = await to(getFilterParams({ complex: project.idOrigin }));
+        if (err) throw new Error('get site filter error');
 
         const projectFlatCount = projectFilters.count;
         const limit = 20;
         let offset = 0;
-        let queryParams = [];
 
-        // while (offset < projectFlatCount) {
+
+        let projCountFlats = 0//test
+        console.log('project name', project.name)//test
+
         for (offset; offset <= projectFlatCount; offset += limit) {
-            queryParams.push({
+            let flats = [];
+
+            [err, flats] = await to(A101Parser.getRoomsData({
                 group: 0,
                 limit: limit,
                 offset: offset,
                 complex: project.idOrigin
-            });
-        }
+            }));
+            if (err) throw new Error('error until get flats from website')
 
-        for (const param of queryParams) {
+            projCountFlats += flats.length;//test
+            // console.log('projCountFlats', projCountFlats, project.idOrigin);
 
-            let flats = null
+            webFlatsIds = flats.map(flat => flat.idOrigin);
 
-            try {
-                flats = await A101Parser.getRoomsData(param);
-            } catch (e) {
-                throw new Error('error until get flats from website')
+            [err, dbFlats] = await to(Flat.getFlatsByIdOrigAndProjectId(webFlatsIds, project._id));
+
+
+            let newFlats = [];
+            let updateDtCheckIds = [];
+
+            for (let webFlat of flats) {
+                let dbFlat = dbFlats.find(dbFlat => {
+                    return dbFlat.idOrigin == webFlat.idOrigin;
+                });
+
+                if (dbFlat != undefined) {
+                    const changes = webFlat.compareWithDbEntity(dbFlat);
+
+                    if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
+                        for (key in changes.new) {
+                            dbFlat[key] = changes.new[key]
+                        }
+                        changes.old['dtChanges'] = requestDate; //date of request start.   
+                        dbFlat.changes.push(changes.old);
+                        dbFlat.dtCheck = requestDate
+                        dbFlat.save(err => {
+                            if (!err) {
+                                stats.update++;
+                            }
+                        });
+                    } else {
+                        updateDtCheckIds.push(dbFlat._id);
+                    }
+                } else {
+                    webFlat.dtCheck = requestDate;
+                    webFlat.projectId = project._id;
+                    newFlats.push(webFlat);
+                }
             }
 
-            if (flats && flats.length > 0) {
-                TOTAL += flats.length;
-                var newFlatsToAdd = [];
-                var updateDtCheckIds = [];
-                
-                webFlatsIds = flats.map(flat => {
-                    return flat.idOrigin;
-                });
-           
-                try {
-                    var dbFlats = await Flat.find({ idOrigin: { $in: webFlatsIds }, projectId: project._id });
-                } catch (e) {
-                    console.log("can't get flats from db");
-                }
+            if (newFlats.length > 0) {
+                [err, insertedFlats] = await to(Flat.insertMany(newFlats));
+                if (err) console.log('err when insert flats');
+                stats.add += insertedFlats.length
+            }
 
-                flats.forEach(webFlat => {
-                    let dbFlat = dbFlats.find(dbFlat => {
-                        return dbFlat.idOrigin == webFlat.idOrigin;
-                    });
-                    if (dbFlat) {
-                        
-                        const changes = webFlat.compareWithDbEntity(dbFlat);
-   
-                        if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
-                            for (key in changes.new) {
-                                dbFlat[key] = changes.new[key]
-                            }
-                            changes.old['dtChanges'] = requestDate; //date of request start.   
-                            dbFlat.changes.push(changes.old);
-                            dbFlat.dtCheck = requestDate
-                            dbFlat.save(err => {
-                                if (!err) {
-                                    stats.update++;
-                                }
-                            });
-                        } else {
-                            updateDtCheckIds.push(dbFlat._id);
-                        }
-                    } else {
-                        webFlat.dtCheck = requestDate;
-                        newFlatsToAdd.push(webFlat)
-                    }
-                });
-
+            if (updateDtCheckIds.length > 0) {
                 Flat.updateDtCheck(updateDtCheckIds, requestDate).exec((err) => {
                     if (err) console.log('err when updatre unchange flat', err);
                 });
-
-                if (newFlatsToAdd.length > 0) {
-                    Flat.insertMany(newFlatsToAdd, (err, insertedFlats) => {
-                        if (err) throw err;
-                        else
-                            stats.add += insertedFlats.length
-                    });
-                }
-
             }
+
         }
-        console.log('TOTAL!!!!!!', TOTAL)
+
     }
     console.log('stats', stats);
     return stats;
+}
+
+
+function test(web, db) {
+    count = 0
+    console.log('-------', web.length, '========', db.length, '----');
+    for (w of web) {
+        var res = db.find(d => w == d.idOrigin)
+        if (res)
+            count++;
+    }
+    return count;
 }
 
 //get parallel all A101 flats
