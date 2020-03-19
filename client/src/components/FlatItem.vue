@@ -1,5 +1,5 @@
 <template>
-  <v-col xs="12" sm="6" md="4" lg="4" xl="3">
+   <v-col xs="12" sm="6" md="4" lg="4" xl="3">
     <v-card>
       <v-img :src="flatValue.imgSrc"></v-img>
 

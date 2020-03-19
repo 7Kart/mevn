@@ -24,28 +24,28 @@ exports.checkSoldFlats = () => {
                             [err, flats] = await to(Flat.getNotCheckedFlats(project._id, date)
                                 .skip(skip)
                                 .limit(limit));
-                            
-                            console.log('flats count', flats.length)
+                            console.log('!!!!', date)  
+                            console.log('flats count', flats)
 
-                            let flatsPromise = flats.map(async (flat) => {
-                                [err, status] = await to(checkSoldStatus(developers[0].code, flat))
-                                return status;
-                            });
+                            // let flatsPromise = flats.map(async (flat) => {
+                            //     [err, status] = await to(checkSoldStatus(developers[0].code, flat))
+                            //     return status;
+                            // });
 
-                            [err, soldStatus] = await to(Promise.all(flatsPromise))
-                            if (err) reject(err)
-                            if (soldStatus) {
-                                const soldFlatIds = soldStatus.reduce((curItem, item) => {
-                                    if (item.status == true) {
-                                        curItem.push(item.idFlat);
-                                    }
-                                    return curItem;
-                                }, []);
+                            // [err, soldStatus] = await to(Promise.all(flatsPromise))
+                            // if (err) reject(err)
+                            // if (soldStatus) {
+                            //     const soldFlatIds = soldStatus.reduce((curItem, item) => {
+                            //         if (item.status == true) {
+                            //             curItem.push(item.idFlat);
+                            //         }
+                            //         return curItem;
+                            //     }, []);
 
-                                if(soldFlatIds.length > 0){
-                                    Flat.changeSaleStatus(soldFlatIds).exec();
-                                }
-                            }
+                            //     if(soldFlatIds.length > 0){
+                            //         Flat.changeSaleStatus(soldFlatIds).exec();
+                            //     }
+                            // }
                             skip += limit;
                         } while (flats && flats.length > 0)
 
