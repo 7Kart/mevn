@@ -1,7 +1,8 @@
 const PickAPI = require("../core/DataProviders/Pick/Source/PickApiGetters"),
     pickRepository = require("../core/DataProviders/Pick/Repository/index"),
     Developer = require("../models/developer"),
-    Flat = require("../models/flat")
+    Flat = require("../models/flat"),
+    to = require('await-to-js').default;
 
 //get all Pick's locations
 exports.GetPickLocation = (req, res) => {
@@ -89,9 +90,41 @@ exports.GetNewPickFlats = (req, res) => {
         .catch((err) => {
             console.log('err', err);
         })
-  
-    
+
+
     res.send({
         status: 200
+    })
+}
+
+
+exports.findDublicate = async (req, res) => {
+
+    let err, flats;
+
+    [err, flats] = await to(Flat.aggregate([
+
+        {
+            $group: {
+                _id: '$idOrigin',
+                ids: { $push: "$_id" },
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $match: {
+                count: { $gt: 1 }
+            }
+        }
+
+    ]))
+
+
+    if (err) console.log(`err`, err);
+    console.log(`flats count`, flats);
+
+
+    res.send({
+        code: 'cool'
     })
 }

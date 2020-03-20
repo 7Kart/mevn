@@ -61,10 +61,6 @@ exports.findNewFlats = async function () {
         const limit = 20;
         let offset = 0;
 
-
-        let projCountFlats = 0//test
-        console.log('project name', project.name)//test
-
         for (offset; offset <= projectFlatCount; offset += limit) {
             let flats = [];
 
@@ -76,15 +72,12 @@ exports.findNewFlats = async function () {
             }));
             if (err) throw new Error('error until get flats from website')
 
-            projCountFlats += flats.length;//test
-            // console.log('projCountFlats', projCountFlats, project.idOrigin);
-
             webFlatsIds = flats.map(flat => flat.idOrigin);
 
             [err, dbFlats] = await to(Flat.getFlatsByIdOrigAndProjectId(webFlatsIds, project._id));
 
 
-            let newFlats = [];
+            let newFlats = [];//inserted flats
             let updateDtCheckIds = [];
 
             for (let webFlat of flats) {
@@ -136,17 +129,6 @@ exports.findNewFlats = async function () {
     return stats;
 }
 
-
-function test(web, db) {
-    count = 0
-    console.log('-------', web.length, '========', db.length, '----');
-    for (w of web) {
-        var res = db.find(d => w == d.idOrigin)
-        if (res)
-            count++;
-    }
-    return count;
-}
 
 //get parallel all A101 flats
 exports.getAsyncAllFlats = function () {

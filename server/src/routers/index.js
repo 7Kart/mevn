@@ -22,5 +22,8 @@ router.get('/GetPickChanges', pickCtr.GetPickChanges);
 router.get('/GetNewPickProjects', pickCtr.GetNewPickProjects);
 router.get('/GetNewPickFlats', pickCtr.GetNewPickFlats)
 
+
+router.get('/findDublicate',pickCtr.findDublicate)
+
 router.get('/mongoUtil', flatCtr.UpdateMongoFlats)
 module.exports = router;
