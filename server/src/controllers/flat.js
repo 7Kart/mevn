@@ -13,7 +13,9 @@ exports.UpdateMongoFlats = async (req, res) => {
 
 exports.GetFlats = async (req, res, next) => {
     const { developerFilter, projectFilter, areaRange, roomCountRange, page } = req.query;
-    let query = {};
+    let query = {
+        isSold: false
+    };
     if (areaRange !== undefined)
         query["area"] = { $gte: areaRange[0], $lte: areaRange[1] };
     if (roomCountRange)
