@@ -55,7 +55,7 @@ FlatSchema.static('updateDtCheck', function (flatIds, dtCheck) {
 });
 
 FlatSchema.static('getLastCheckDate', function (projectId) {
-    return this.find({ dtCheck: { $ne: null } }, { _id: 0, dtCheck: 1 }).sort({ dtCheck: -1 }).limit(1)
+    return this.find({ dtCheck: { $ne: null }, projectId:projectId }, { _id: 0, dtCheck: 1 }).sort({ dtCheck: -1 }).limit(1)
 });
 
 FlatSchema.static('changeSaleStatus', function (saleFlatIds) {

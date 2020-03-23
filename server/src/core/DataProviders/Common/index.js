@@ -19,13 +19,13 @@ exports.checkSoldFlats = () => {
                     if (err) { reject(err) };
                     if (lastCheckDate.length > 0) {
                         const date = lastCheckDate[0].dtCheck;
+                        
                         let flats, skip = 0, limit = 5;
                         do {
                             [err, flats] = await to(Flat.getNotCheckedFlats(project._id, date)
                                 .sort({ _id: 1 })
                                 .skip(skip)
                                 .limit(limit));
-
 
                             let flatsPromise = flats.map(async (flat) => {
                                 [err, status] = await to(checkSoldStatus(developers[0].code, flat))
@@ -47,7 +47,6 @@ exports.checkSoldFlats = () => {
                                     Flat.changeSaleStatus(soldFlatIds).exec();
                                 }
                             }
-
                             skip += limit;
                         } while (flats && flats.length > 0)
                         if (err) reject(err);

@@ -139,7 +139,7 @@ exports.getNewPickFlats = async () => {
                                         }
                                         changes.old['dtChanges'] = requestDate; //date of request start.   
                                         dbFlat.changes.push(changes.old);
-                                        dbFlat.dtCheck = requestDate
+                                        dbFlat.dtCheck = requestDate;          
                                         dbFlat.save(err=>{
                                             if(!err){
                                                 status.update++;
