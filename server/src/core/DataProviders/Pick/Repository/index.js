@@ -3,7 +3,8 @@ const pickAPI = require('../Source/PickApiGetters'),
     PickFlat = require("../../DataModel/PickFlat"),
     mongoose = require("mongoose"),
     Location = require("../../../../models/location"),
-    DbFlat = require("../../../../models/flat")
+    DbFlat = require("../../../../models/flat"),
+    to = require('await-to-js').default;
 
 exports.getPickChanges = async () => {
     return Developer.findOne({ name: "ПИК" }, { projects: 1 }).populate({
@@ -90,99 +91,107 @@ exports.findNewProjects = async () => {
 
 exports.getNewPickFlats = async () => {
     console.log('init find new flats');
+    let err = null;
     let developer = null;
     const requestDate = new Date();
 
-    try {
-        developer = await Developer.findOne({ name: "ПИК" }, {})
-        let status = {
-            update: 0,
-            add: 0,
-            date: requestDate
-        }
-        if (developer) {
-            for (let dbProject of developer.projects) {
-                try {
-                    let startPage = 0;
-                    let webQueryFinishFlag = false;
-                    do {
-                        let webFlats = null;
-                        const httpResult = await pickAPI.getPickFlats({
-                            page: startPage,
-                            block_id: dbProject.idOrigin
-                        })
-                        webFlats = httpResult.body;
-                        if (webFlats.flats !== undefined && webFlats.flats.length > 0) {
-
-                            var flatsIdOrigin = webFlats.flats.map((flat) => {
-                                return flat.id;
-                            });
-                            const dbFlats = await DbFlat.find({ idOrigin: { $in: flatsIdOrigin }, projectId: dbProject._id })
-
-                            let newFlatsToAdd = [];
-                            let updateDtCheckIds = [];
-
-                            webFlats.flats.forEach((flat) => {
-                                let webFlat = new PickFlat(flat, dbProject._id);
-                                webFlat.dtCheck = requestDate;
-
-                                let dbFlat = dbFlats.find((dbFlat) => {
-                                    return dbFlat.idOrigin == webFlat.idOrigin;
-                                });
-
-                                if (dbFlat) {
-                                    const changes = webFlat.compareWithDbEntity(dbFlat);
-
-                                    if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
-                                        for (key in changes.new) {
-                                            dbFlat[key] = changes.new[key]
-                                        }
-                                        changes.old['dtChanges'] = requestDate; //date of request start.   
-                                        dbFlat.changes.push(changes.old);
-                                        dbFlat.dtCheck = requestDate;          
-                                        dbFlat.save(err=>{
-                                            if(!err){
-                                                status.update++;
-                                            }
-                                        })
-
-                                    } else {
-                                        updateDtCheckIds.push(dbFlat._id);
-                                    }
-                                } else {
-                                    newFlatsToAdd.push(webFlat);
-                                }
-                            });
-
-                            DbFlat.updateDtCheck(updateDtCheckIds, requestDate).exec((err) => {
-                                if (err) {
-                                    console.log("update dtCheck error!")
-                                }
-                            });
-
-                            if (newFlatsToAdd.length > 0) {
-                                DbFlat.insertMany(newFlatsToAdd, (err, insertedFlats) => {
-                                    if (err) throw err;
-                                    else
-                                        status.add += insertedFlats.length
-                                });
-                            }
-
-                            startPage++;
-                        } else {
-                            webQueryFinishFlag = true;
-                        }
-                    } while (!webQueryFinishFlag)
-                } catch (e) {
-                    throw e;
-                }
-            }
-
-            return status
-        } else {
-            throw new Error("developer is not found")
-        }
-    } catch (e) {
-        throw e;
+    [err, developer] = await to(Developer.findOne({ name: "ПИК" }, {}));
+    if (err) console.log('developer find error')
+    let status = {
+        update: 0,
+        add: 0,
+        date: requestDate
     }
+    if (developer) {
+        for (let dbProject of developer.projects) {
+
+            let startPage = 0;
+            let webQueryFinishFlag = false;
+            do {
+                let webFlats = null;
+                console.log(`get web`);
+                
+                [err, httpResult] = await to(pickAPI.getPickFlats({
+                    page: startPage,
+                    block_id: dbProject.idOrigin
+                }));
+                console.log(`web here`);
+                
+                if (err) console.log(`http result err`, err);
+
+                webFlats = httpResult.body;
+                if (webFlats.flats !== undefined && webFlats.flats.length > 0) {
+                    console.log(`!`);
+                    
+                    var flatsIdOrigin = webFlats.flats.map((flat) => {
+                        return flat.id;
+                    });
+
+                    [err, dbFlats] = await to(DbFlat.find({ idOrigin: { $in: flatsIdOrigin }, projectId: dbProject._id }))
+
+                    if (err) console.log(`get db's flats err`);
+
+                    let newFlatsToAdd = [];
+                    let updateDtCheckIds = [];
+
+                    webFlats.flats.forEach((flat) => {
+                        let webFlat = new PickFlat(flat, dbProject._id);
+                        webFlat.dtCheck = requestDate;
+
+                        let dbFlat = dbFlats.find((dbFlat) => {
+                            return dbFlat.idOrigin == webFlat.idOrigin;
+                        });
+
+                        if (dbFlat) {
+                            const changes = webFlat.compareWithDbEntity(dbFlat);
+
+                            if (Object.keys(changes.new).length !== 0 || changes.new.constructor !== Object) {
+                                for (key in changes.new) {
+                                    dbFlat[key] = changes.new[key]
+                                }
+                                changes.old['dtChanges'] = requestDate; //date of request start.   
+                                dbFlat.changes.push(changes.old);
+                                dbFlat.dtCheck = requestDate;
+                                dbFlat.save(err => {
+                                    if (err) console.log('update flat error')
+                                    if (!err) {
+                                        status.update++;
+                                    }
+                                })
+
+                            } else {
+                                updateDtCheckIds.push(dbFlat._id);
+                            }
+                        } else {
+                            newFlatsToAdd.push(webFlat);
+                        }
+                    });
+
+                    DbFlat.updateDtCheck(updateDtCheckIds, requestDate).exec((err) => {
+                        if (err) {
+                            console.log("update dtCheck error!")
+                        }
+                    });
+
+                    if (newFlatsToAdd.length > 0) {
+                        DbFlat.insertMany(newFlatsToAdd, (err, insertedFlats) => {
+                            if (err) console.log('insert error');
+                            else
+                                status.add += insertedFlats.length
+                        });
+                    }
+
+                    startPage++;
+                } else {
+                    webQueryFinishFlag = true;
+                }
+            } while (!webQueryFinishFlag)
+
+        }
+        console.log('FINISH')
+        return status
+    } else {
+        throw new Error("developer is not found")
+    }
+
 }

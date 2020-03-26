@@ -16,6 +16,8 @@ mongoose.connection.on("connected", () => {
     app.use(require('./routers'));
     app.use('/developers', require('./routers/developers'));
     app.use('/flats', require('./routers/flats'));
+    app.use('/statistics', require('./routers/statistics'));
+
 
     app.use(bodyParser.json());
     app.use((err, req, res, next) => {
