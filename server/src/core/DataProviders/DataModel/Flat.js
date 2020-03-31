@@ -42,7 +42,7 @@ module.exports = class Flat {
                 if (this[key] instanceof Date) {
                     if (this[key].getTime() != dbFlat[key].getTime()) {
                         difference.new[key] = this[key];
-                        difference.new[key] = dbFlat[key];
+                        difference.old[key] = dbFlat[key];
                     }
                 } else {    
                     if (this[key] != dbFlat[key]) {
@@ -52,6 +52,7 @@ module.exports = class Flat {
                 }
             }
         }
+        
         return difference;
     }
 };

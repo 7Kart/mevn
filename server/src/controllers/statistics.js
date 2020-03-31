@@ -42,19 +42,20 @@ exports.GetStatisctics = async (req, res) => {
                 prisePerMeter: 1,
                 dateInsert: 1,
                 dtCheck: 1,
-                changes: 1
-            }
-        }, {
-            $unwind: "$changes"
-        }, {
-            $match: {
-                $and: [
-                    {
-                        "changes.prisePerMeter": { $exists: true }
+                changes: {
+                    $filter: {
+                        input: '$changes',
+                        as: 'item',
+                        cond: { $exists: ['$$item.prisePerMeter', 1] }
                     }
-                ]
+                }
             }
+         
         }
+        
+
+
+
         // }, {
         //     $limit: 5
         // }
@@ -67,3 +68,5 @@ exports.GetStatisctics = async (req, res) => {
     })
 
 }
+
+// dateFinished
