@@ -55,7 +55,7 @@ FlatSchema.static('updateDtCheck', function (flatIds, dtCheck) {
 });
 
 FlatSchema.static('getLastCheckDate', function (projectId) {
-    return this.find({ dtCheck: { $ne: null }, projectId:projectId }, { _id: 0, dtCheck: 1 }).sort({ dtCheck: -1 }).limit(1)
+    return this.find({ dtCheck: { $ne: null }, projectId: projectId }, { _id: 0, dtCheck: 1 }).sort({ dtCheck: -1 }).limit(1)
 });
 
 FlatSchema.static('changeSaleStatus', function (saleFlatIds) {
@@ -88,5 +88,70 @@ FlatSchema.static("getFlatsByIdOrigAndProjectId", function (originIds, projectId
     });
 })
 
+FlatSchema.static("getFlatsCoastByDate", function (date, skip, limit) {
+    return this.aggregate([
+        {
+            $match: {
+                projectId: new mongoose.Types.ObjectId("5e249cc11335fa000067e083"),
+                dateInsert: { $lte: date },
+                $or: [{
+                    dtCheck: { $gte: date }
+                }, {
+                    $and: [{
+                        dtCheck: null
+                    }, {
+                        changes: {
+                            $elemMatch: {
+                                dtChanges: { $lte: date }
+                            }
+                        }
+                    }]
+                }]
+            }
+        },
+        {
+            $skip : skip
+        }, {
+            $limit: limit
+
+        },
+        {
+            $project: {
+                _id: 1,
+                coast: 1,
+                prisePerMeter: 1,
+                dateInsert: 1,
+                dtCheck: 1,
+                changes: {
+                    $filter: {
+                        input: "$changes",
+                        as: 'item',
+                        cond: {
+                            $and: [
+                                { $gt: ["$$item.prisePerMeter", null] },
+                                { $lte: ["$$item.dtChanges", date] }
+                            ]
+                        }
+                    }
+                }
+            }
+        }, {
+            $project: {
+                _id: 1,
+                coast: 1,
+                prisePerMeter: 1,
+                dateInsert: 1,
+                dtCheck: 1,
+                lastChange: {
+                    $cond: [
+                        { "$eq": [{ "$size": "$changes" }, 0] },
+                        null,
+                        { $arrayElemAt: ["$changes", -1] }
+                    ]
+                }
+            }
+        }
+    ])
+});
 
 module.exports = mongoose.model('flats', FlatSchema);

@@ -1,67 +1,41 @@
 const Flats = require("../models/flat"),
     Developer = require("../models/developer"),
-    Types = require("mongoose").Types,
     to = require('await-to-js').default;
 
 
 
 exports.GetStatisctics = async (req, res) => {
 
-    let err = null, flats = null;
+    let err = null, allPrice = [];
 
     const startDate = new Date();
     startDate.setHours(0, 0, 0, 0);
 
-    // const dateFinish = new Date(startDate);
-    // dateFinish.setDate(dateFinish.getDate() - 1);
+    let limit = 20, skip = 0;
 
-    [err, flats] = await to(Flats.aggregate([
-        {
-            $match: {
-                projectId: new Types.ObjectId("5e249cc11335fa000067e083"),
-                dateInsert: { $lte: startDate },
-                changes: { $not: { $size: 0 } },
-                $or: [{
-                    dtCheck: { $gte: startDate }
-                }, {
-                    $and: [{
-                        dtCheck: null
-                    }, {
-                        changes: {
-                            $elemMatch: {
-                                dtChanges: { $gte: startDate }
-                            }
-                        }
-                    }]
-                }]
-            }
-        }, {
-            $project: {
-                _id: 1,
-                coast: 1,
-                prisePerMeter: 1,
-                dateInsert: 1,
-                dtCheck: 1,
-                changes: {
-                    $filter: {
-                        input: '$changes',
-                        as: 'item',
-                        cond: { $exists: ['$$item.prisePerMeter', 1] }
-                    }
+    do {
+
+        [err, flats] = await to(Flats.getFlatsCoastByDate(startDate, skip, limit));
+
+        console.log('flags', flats);
+
+        flats.forEach(flat => {
+            if (flat.lastChange != null) {
+                if (flat.dtCheck == null || flat.dtCheck.setHours(0, 0, 0, 0) > startDate) {
+                    allPrice.push(flat.lastChange.prisePerMeter);
+                } else {
+                    allPrice.push(flat.prisePerMeter);
                 }
+            } else {
+                allPrice.push(flat.prisePerMeter)
             }
-         
-        }
-        
+        });
 
+        skip += limit;
+    } while (false)
+    // } while (flats && flats.length > 0)
 
-
-        // }, {
-        //     $limit: 5
-        // }
-    ]));
-
-    console.log('err, flats', err, flats, flats.length);
+    console.log('flats', allPrice);
 
     res.send({
         code: 200

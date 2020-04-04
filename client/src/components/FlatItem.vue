@@ -1,5 +1,5 @@
 <template>
-   <v-col xs="12" sm="6" md="4" lg="4" xl="3">
+  <v-col xs="12" sm="6" md="4" lg="4" xl="3">
     <v-card>
       <v-img :src="flatValue.imgSrc"></v-img>
 
@@ -14,32 +14,25 @@
       <v-card-actions>
         <v-btn text @click="vk(flatValue.href)">Share</v-btn>
 
-        <v-btn color="purple" title="перейти на сайт застройщика" text @click="toOriginalSite(flatValue.href)">Подробнее</v-btn>
+        <v-btn
+          color="purple"
+          title="перейти на сайт застройщика"
+          text
+          @click="toOriginalSite(flatValue.href)"
+        >Подробнее</v-btn>
 
         <v-spacer></v-spacer>
 
-        <v-btn v-show="getFlatCoast.length > 1" icon @click="show = !show">
+        <v-btn icon @click="showChart">
           <v-icon>{{ show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
         </v-btn>
       </v-card-actions>
 
       <v-expand-transition>
-        <div v-if="getFlatCoast.length > 1" v-show="show">
+        <div v-show="show">
           <v-divider></v-divider>
-          <v-card-text>
-            <v-sheet color="cyan">
-              <v-sparkline
-                :value="getFlatCoast"
-                :labels="getFlatCoast"
-                label-size="9"
-                color="rgba(255, 255, 255, .7)"
-                height="100"
-                padding="24"
-                stroke-linecap="round"
-                smooth
-              ></v-sparkline>
-            </v-sheet>
-          </v-card-text>
+
+          <chart :chartdata="getFlatCoast" :options="chartOptions" :isRender="isRenderChart" />
         </div>
       </v-expand-transition>
     </v-card>
@@ -47,7 +40,23 @@
 </template>
 
 <script>
+import chart from "./charts/statChart";
+
 export default {
+  components: {
+    chart
+  },
+  data: () => {
+    return {
+      chartOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+        fill: false
+      },
+      isRenderChart: false,
+      show: false
+    };
+  },
   props: {
     flatValue: {
       type: Object,
@@ -56,28 +65,46 @@ export default {
   },
   computed: {
     getFlatCoast() {
-      let coastList = [];
+      let chartdata = {
+        labels: [],
+        datasets: [
+          {
+            label: "Data One",
+            backgroundColor: "#f87979",
+            data: []
+          }
+        ]
+      };
       this.flatValue.changes.forEach(change => {
-        if (change["coast"]) coastList.push(change["coast"]);
+        if (change.hasOwnProperty("prisePerMeter")) {
+          chartdata.labels.push(this.outPutDate(change.dtChanges));
+          chartdata.datasets[0].data.push(change.prisePerMeter);
+        }
       });
-      coastList.push(this.flatValue.coast);
-      return coastList;
+      chartdata.labels.push(this.outPutDate(this.flatValue.dtCheck));
+      chartdata.datasets[0].data.push(this.flatValue.prisePerMeter);
+
+      return chartdata;
     }
-  },
-  data() {
-    return {
-      show: false
-    };
   },
   methods: {
     getYear(date) {
       return `${new Date(date).getFullYear()} г.`;
     },
+    outPutDate(date) {
+      let parseDate = new Date(Date.parse(date));
+      return `${parseDate.getDate()}.${parseDate.getMonth() +
+        1}.${parseDate.getFullYear()}`;
+    },
     toOriginalSite(link) {
       window.open(link, "_blank");
     },
-    vk(link){
-      window.open(`http://vkontakte.ru/share.php?url=${link}`, "_blank")
+    vk(link) {
+      window.open(`http://vkontakte.ru/share.php?url=${link}`, "_blank");
+    },
+    showChart() {
+      this.show = !this.show;
+      this.isRenderChart = !this.isRenderChart;
     }
   }
 };
