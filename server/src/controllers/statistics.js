@@ -21,7 +21,7 @@ exports.GetStatisctics = async (req, res) => {
 
         flats.forEach(flat => {
             if (flat.lastChange != null) {
-                if (flat.dtCheck == null || flat.dtCheck.setHours(0, 0, 0, 0) > startDate) {
+                if (flat.dtCheck.setHours(0, 0, 0, 0) > startDate) {
                     allPrice.push(flat.lastChange.prisePerMeter);
                 } else {
                     allPrice.push(flat.prisePerMeter);
@@ -33,9 +33,7 @@ exports.GetStatisctics = async (req, res) => {
 
         skip += limit;
     } while (false)
-    // } while (flats && flats.length > 0)
-
-    console.log('flats', allPrice);
+  
 
     res.send({
         code: 200

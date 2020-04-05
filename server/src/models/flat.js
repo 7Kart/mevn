@@ -93,27 +93,14 @@ FlatSchema.static("getFlatsCoastByDate", function (date, skip, limit) {
         {
             $match: {
                 projectId: new mongoose.Types.ObjectId("5e249cc11335fa000067e083"),
-                dateInsert: { $lte: date },
-                $or: [{
-                    dtCheck: { $gte: date }
-                }, {
-                    $and: [{
-                        dtCheck: null
-                    }, {
-                        changes: {
-                            $elemMatch: {
-                                dtChanges: { $lte: date }
-                            }
-                        }
-                    }]
-                }]
+                dateInsert: { $lte: date },               
+                dtCheck: { $gte: date }             
             }
         },
         {
             $skip : skip
         }, {
             $limit: limit
-
         },
         {
             $project: {
