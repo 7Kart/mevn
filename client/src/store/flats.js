@@ -18,7 +18,7 @@ export default {
             else
                 state.flats.push(...payload);
         },
-        changePage(state, payload) {            
+        changePage(state, payload) {
             if (payload === undefined || payload === null)
                 state.currentPage++;
             else
@@ -30,8 +30,9 @@ export default {
     },
     actions: {
         getFlats({ state, commit }, payload) {
+
             commit("changeLoadFlatFlag", true);
-            axios.get("http://localhost:8081/flats/GetFlats", {
+            axios.get(`${process.env.VUE_APP_HOST}/flats/GetFlats`, {
                 params: {
                     page: state.currentPage,
                     ...payload

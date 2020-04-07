@@ -17,7 +17,7 @@ exports.GetStatisctics = async (req, res) => {
 
         [err, flats] = await to(Flats.getFlatsCoastByDate(startDate, skip, limit));
 
-        console.log('flags', flats);
+        // console.log('flags', flats);
 
         flats.forEach(flat => {
             if (flat.lastChange != null) {
@@ -36,7 +36,7 @@ exports.GetStatisctics = async (req, res) => {
   
 
     res.send({
-        code: 200
+        code: allPrice
     })
 
 }

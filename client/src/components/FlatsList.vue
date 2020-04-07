@@ -38,9 +38,7 @@ export default {
       this.$store.dispatch("getFlats", filters);
     }
   },
-  mounted() {
-    this.$store.dispatch("getFlats");
-  },
+
   methods: {
     onScroll(e) {
       if (!this.getFlatsLoadingStatus) {

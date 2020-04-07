@@ -15,7 +15,7 @@ export default {
     },
     actions: {
         getAllDevelopers({ commit }) {
-            axios.get('http://localhost:8081/developers/GetAllDevelopers')
+            axios.get(`${process.env.VUE_APP_HOST}/developers/GetAllDevelopers`)
                 .then(res => {
                     console.log("developers", res)
                     if (res.status == 200) {
@@ -27,7 +27,7 @@ export default {
                 });
         },
         getDevelopersProjects({ commit }, payload) {
-            axios.get('http://localhost:8081/developers/getDevelopersProjects', {
+            axios.get(`${process.env.VUE_APP_HOST}/developers/getDevelopersProjects`, {
                 params: {
                     ids: payload
                 }

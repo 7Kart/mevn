@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import chart from "./charts/statChart";
+import chart from "./charts/SingleFlatChart";
 
 export default {
   components: {
@@ -51,15 +51,7 @@ export default {
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false,
-        fill: false,
-        // scales: {
-        //   xAxes: [
-        //     {
-        //       type: "linear",
-        //       position: "bottom"
-        //     }
-        //   ]
-        // }
+        fill: false
       },
       isRenderChart: false,
       show: false
@@ -77,10 +69,8 @@ export default {
         labels: [],
         datasets: [
           {
-            label: "Цена за метр",
-            backgroundColor: "#1976d233",
-            borderColor: "#1976d2",
-            borderCapStyle: "#9c27b0",
+            label: "Data One",
+            backgroundColor: "#f87979",
             data: []
           }
         ]
