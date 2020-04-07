@@ -58,7 +58,6 @@ export default {
   },
 
   mounted() {
-    console.log('init mounted');
     this.$store.dispatch("getStatistic", {});
   },
 

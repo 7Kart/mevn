@@ -93,12 +93,12 @@ FlatSchema.static("getFlatsCoastByDate", function (date, skip, limit) {
         {
             $match: {
                 projectId: new mongoose.Types.ObjectId("5e249cc11335fa000067e083"),
-                dateInsert: { $lte: date },               
-                dtCheck: { $gte: date }             
+                dateInsert: { $lte: date },
+                dtCheck: { $gte: date }
             }
         },
         {
-            $skip : skip
+            $skip: skip
         }, {
             $limit: limit
         },
@@ -140,5 +140,45 @@ FlatSchema.static("getFlatsCoastByDate", function (date, skip, limit) {
         }
     ])
 });
+
+
+FlatSchema.static("getFlatsCoastByPeriod", function (dtStart, dtEnd, skip, limit) {
+    return this.aggregate([
+        {
+            $match: {
+                projectId: new mongoose.Types.ObjectId("5e249cc11335fa000067e083"),
+                dateInsert: { $lte: dtEnd },
+                dtCheck: { $gte: dtStart }
+            }
+        },
+        {
+            $skip: skip
+        }, {
+            $limit: limit
+        },
+        {
+            $project: {
+                _id: 1,
+                coast: 1,
+                prisePerMeter: 1,
+                dateInsert: 1,
+                dtCheck: 1,
+                changes: {
+                    $filter: {
+                        input: "$changes",
+                        as: 'item',
+                        cond: {
+                            $and: [
+                                { $gt: ["$$item.prisePerMeter", null] },
+                                { $lte: ["$$item.dtChanges", dtEnd] },
+                                { $gte: ["$$item.dtChanges", dtStart] }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ])
+})
 
 module.exports = mongoose.model('flats', FlatSchema);

@@ -6,37 +6,27 @@ const Flats = require("../models/flat"),
 
 exports.GetStatisctics = async (req, res) => {
 
-    let err = null, allPrice = [];
+    let err = null, prices = [];
 
-    const startDate = new Date();
+    const startDate = new Date(2020, 1, 1);
+    const endDate = new Date()
+
+    endDate.setHours(0, 0, 0, 0);
     startDate.setHours(0, 0, 0, 0);
 
-    let limit = 20, skip = 0;
+    skip = 0;
+    limit = 50;
 
     do {
+        [err, flats] = await to(Flats.getFlatsCoastByPeriod(startDate, endDate, skip, limit));
 
-        [err, flats] = await to(Flats.getFlatsCoastByDate(startDate, skip, limit));
+        prices.push(...flats)
+        skip += limit
+    } while (flats && flats.length > 0)
 
-        // console.log('flags', flats);
 
-        flats.forEach(flat => {
-            if (flat.lastChange != null) {
-                if (flat.dtCheck.setHours(0, 0, 0, 0) > startDate) {
-                    allPrice.push(flat.lastChange.prisePerMeter);
-                } else {
-                    allPrice.push(flat.prisePerMeter);
-                }
-            } else {
-                allPrice.push(flat.prisePerMeter)
-            }
-        });
-
-        skip += limit;
-    } while (false)
-  
-
-    res.send({
-        code: allPrice
+    res.json({
+        prices
     })
 
 }

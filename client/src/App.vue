@@ -1,7 +1,7 @@
 <template>
   <v-app id="inspire">
     <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="blue darken-3" :collapse-on-scroll="true" dark>
-      <v-toolbar-title style="width: 300px" class="ml-0 pl-3">
+      <v-toolbar-title class="ml-0 pl-3">
         <v-app-bar-nav-icon @click.stop="mini = !mini"></v-app-bar-nav-icon>
         <span class="hidden-sm-and-down">Hives</span>
       </v-toolbar-title>
