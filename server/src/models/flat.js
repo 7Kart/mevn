@@ -146,6 +146,7 @@ FlatSchema.static("getFlatsCoastByPeriod", function (dtStart, dtEnd, skip, limit
     return this.aggregate([
         {
             $match: {
+                // projectId: new mongoose.Types.ObjectId("5e249bd51335fa000067e080"),
                 projectId: new mongoose.Types.ObjectId("5e249cc11335fa000067e083"),
                 dateInsert: { $lte: dtEnd },
                 dtCheck: { $gte: dtStart }

@@ -19,15 +19,15 @@ exports.GetStatisctics = async (req, res) => {
 
     do {
         [err, flats] = await to(Flats.getFlatsCoastByPeriod(startDate, endDate, skip, limit));
-
         prices.push(...flats)
         skip += limit
     } while (flats && flats.length > 0)
 
-
-    res.json({
+    console.log('prices', prices);
+  
+    res.send(
         prices
-    })
+    )
 
 }
 
