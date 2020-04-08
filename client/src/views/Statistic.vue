@@ -13,17 +13,36 @@
             <v-list-item three-line>
               <v-list-item-content>
                 <div class="overline mb-4 sm-12">ЦЕНА ЗА КВАДРАТ</div>
-                <!-- date picker -->
-                
-                <v-date-picker
-                  ref="picker"
-                  locale="ru"
-                  first-day-of-week="1"
-                  v-model="date"
-                  :picker-date.sync="pickerDate"
-                  full-width
-                ></v-date-picker>
 
+                <div xs-12>
+                  <v-menu
+                    ref="menu"
+                    v-model="menu"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        v-model="dateRangeText"
+                        label="Период"
+                        readonly
+                        prepend-icon="mdi-calendar-multiselect"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      locale="ru"
+                      first-day-of-week="1"
+                      v-model="dates"
+                      no-title
+                      range
+                      @blur="menu = false"
+                    ></v-date-picker>
+                  </v-menu>
+                </div>
               </v-list-item-content>
             </v-list-item>
             <v-card-actions>
@@ -45,10 +64,10 @@ export default {
     chart
   },
 
-  data: () => {
+  data: vm => {
     return {
-      pickerDate: null,
-      date: new Date().toISOString().substr(0, 10),
+      dates: ['2020-04-10', '2020-04-20'],
+      menu: false,
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false,
@@ -80,14 +99,21 @@ export default {
           }
         ]
       };
-    }
+    },
+    dateRangeText () {
+      return this.dates.join(' ~ ')
+    },
   },
 
   mounted() {
     this.$store.dispatch("getStatistic", {});
   },
 
-  methods: {}
+
+
+  methods: {
+
+  }
 };
 </script>
 

@@ -69,8 +69,11 @@ export default {
         labels: [],
         datasets: [
           {
-            label: "Data One",
-            backgroundColor: "#f87979",
+            label: "Цена за квадрат",
+            backgroundColor: "#1565c057",
+            borderColor: "#1565c0",
+            borderWidth: 1,
+            pointBorderColor: "#07519a",
             data: []
           }
         ]
