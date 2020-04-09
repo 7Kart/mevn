@@ -17,7 +17,10 @@ export default {
     actions: {
         getStatistic({ commit }, payload) {
             axios.get(`${process.env.VUE_APP_HOST}/statistics/GetStatistics`, {
-                params: payload
+                params: {
+                    dtStart: new Date(2020, 1, 1),
+                    dtEnd: new Date(),
+                }
             })
                 .then(res => {
                     commit('getStatistic', res.data);
