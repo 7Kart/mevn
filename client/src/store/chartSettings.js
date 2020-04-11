@@ -39,17 +39,16 @@ export default {
         GetAllCrartsData(state, payload) {
             const chart = state.charts.find(chart => chart.id == payload.chartId)
             if (chart) {
-                console.log('payload.chartData', payload.chartData);
-
                 payload.chartData.forEach(data => {
                     JSON.dateParser(data)
                 });
                 chart.data = payload.chartData
-            }
+             }
         }
     },
 
     actions: {
+
         GetAllCrartsData({ state, commit }) {
             for (let chart of state.charts) {
                 axios.get(`${process.env.VUE_APP_HOST}/statistics/GetStatistics`, {
@@ -72,10 +71,6 @@ export default {
     getters: {
         getCharts: (state) => {
             return state.charts;
-        },
-
-        getChartsDataset: (state) => {
-            
         },
 
         getChartsDatasets: state => idChart => {

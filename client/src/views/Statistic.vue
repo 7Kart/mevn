@@ -41,16 +41,14 @@ export default {
 
   data() {
     return {
-      charts: this.$store.getters.getCharts
+      charts: []
     };
   },
 
-  mounted() {
-    this.$store.dispatch("GetAllCrartsData");
-  },
+  mounted() {},
 
   methods: {}
 };
 </script>
 
-  
+   

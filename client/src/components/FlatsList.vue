@@ -1,5 +1,5 @@
 <template>
-  <v-container v-scroll:#scrolling-flats="onScroll">
+  <v-container v-scroll="onScroll">
     <v-row>
       <FlatItem v-for="flat in getFlats" :key="flat._id" :flat-value="flat"></FlatItem>
       <v-progress-linear
@@ -42,7 +42,7 @@ export default {
   methods: {
     onScroll(e) {
       if (!this.getFlatsLoadingStatus) {
-        if (e.target.offsetHeight + e.target.scrollTop == e.target.scrollHeight) {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
           this.$store.dispatch("changePage");
           this.$store.dispatch("getFlats", this.getAllFilterValues);
         }

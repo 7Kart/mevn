@@ -25,7 +25,7 @@ export default function (flats, dateStart, dateEnd, stap) {
                 let currentFlatCoast = changes[0].prisePerMeter;
 
                 for (let changeInd = 1; changeInd < changes.length; changeInd++) {
-                    if (changes[changeInd].dtChanges <= dateStart) {
+                    if (changes[changeInd].dtChanges < dateStart) {
                         currentFlatCoast = changes[changeInd].prisePerMeter;
                     }
                 }

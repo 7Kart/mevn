@@ -1,5 +1,5 @@
 <template>
-  <v-app id="inspire">
+  <v-app id="scrolling-flats">
     <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app color="blue darken-3" :collapse-on-scroll="true" dark>
       <v-toolbar-title class="ml-0 pl-3">
         <v-app-bar-nav-icon @click.stop="mini = !mini"></v-app-bar-nav-icon>
@@ -26,8 +26,8 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-content>
-      <v-container>
+    <v-content id="scrolling-flats">
+      <v-container id="scroll-target">
         <router-view></router-view>
       </v-container>
     </v-content>
@@ -37,7 +37,6 @@
 <script>
 export default {
   name: "App",
-
   components: {},
   mounted() {
     this.$store.dispatch("getFlats");
