@@ -14,7 +14,7 @@ export default {
             filter: {
                 dtStart: new Date(2020, 1, 1),
                 dtEnd: new Date(),
-                intervalStep: 5
+                intervalStep: 1
             },
             data: []
         },
@@ -27,57 +27,24 @@ export default {
                 fill: false
             },
             filter: {
-                dtStart: new Date(2020, 3, 1),
+                dtStart: new Date(2020, 2, 1),
                 dtEnd: new Date(),
-                intervalStep: 5
+                intervalStep: 1
             },
             data: []
         }]
     },
 
     mutations: {
-        GetAllCrartsData(state, payload) {
+        GetChartData(state, payload) {
+            console.log('mutation init ', payload);
             const chart = state.charts.find(chart => chart.id == payload.chartId)
             if (chart) {
                 payload.chartData.forEach(data => {
                     JSON.dateParser(data)
                 });
-                chart.data = payload.chartData
-             }
-        }
-    },
-
-    actions: {
-
-        GetAllCrartsData({ state, commit }) {
-            for (let chart of state.charts) {
-                axios.get(`${process.env.VUE_APP_HOST}/statistics/GetStatistics`, {
-                    params: {
-                        dtStart: chart.filter.dtStart,
-                        dtEnd: chart.filter.dtEnd,
-                    }
-                }).then(res => {
-                    commit('GetAllCrartsData', {
-                        chartData: res.data,
-                        chartId: chart.id
-                    });
-                }).catch(err => {
-                    console.log('query error', err);
-                });
-            };
-        }
-    },
-
-    getters: {
-        getCharts: (state) => {
-            return state.charts;
-        },
-
-        getChartsDatasets: state => idChart => {
-            const chart = state.charts.find(chart => chart.id == idChart)
-            if (chart) {
-                const meanValue = statisticBuilder(chart.data, chart.filter.dtStart, chart.filter.dtEnd, chart.filter.intervalStep)
-                return {
+                const meanValue = statisticBuilder(payload.chartData, chart.filter.dtStart, chart.filter.dtEnd, chart.filter.intervalStep)
+                chart.data = {
                     labels: meanValue.map(
                         state =>
                             `${state.date.getDate()}. ${state.date.getMonth() +
@@ -94,6 +61,35 @@ export default {
                     ]
                 }
             }
+        },
+    },
+
+    actions: {
+        GetChartData({ state, commit }, idChart) {
+            const chart = state.charts.find(chart => chart.id == idChart);
+
+            console.log('state.charts',chart.filter );
+
+            axios.get(`${process.env.VUE_APP_HOST}/statistics/GetStatistics`, {
+                params: {
+                    dtStart: chart.filter.dtStart,
+                    dtEnd: chart.filter.dtEnd,
+                }
+            }).then(res => {
+                commit('GetChartData', {
+                    chartData: res.data,
+                    chartId: chart.id
+                });
+            }).catch(err => {
+                console.log('query error', err);
+            });
+
+        }
+    },
+
+    getters: {
+        getAllCharts: (state) => {
+            return state.charts;
         }
     }
 

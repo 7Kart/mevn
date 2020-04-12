@@ -1,18 +1,20 @@
 export default function (flats, dateStart, dateEnd, stap) {
     const res = [];
 
-    while (dateStart < dateEnd) {
-        dateStart.setDate(dateStart.getDate() + stap)
+    let curDate = new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate())
+
+    while (curDate < dateEnd) {
+        curDate.setDate(curDate.getDate() + stap)
 
         let statistic = {
-            date: new Date(dateStart.getFullYear(), dateStart.getMonth(), dateStart.getDate()),
+            date: new Date(curDate.getFullYear(), curDate.getMonth(), curDate.getDate()),
             meanValue: 0
         }
 
         let coasts = [];
 
         flats.forEach(flat => {
-            if (dateStart <= flat.dtCheck && dateStart >= flat.dateInsert) {
+            if (curDate <= flat.dtCheck && curDate >= flat.dateInsert) {
 
                 let changes = [...flat.changes];
 
@@ -25,7 +27,7 @@ export default function (flats, dateStart, dateEnd, stap) {
                 let currentFlatCoast = changes[0].prisePerMeter;
 
                 for (let changeInd = 1; changeInd < changes.length; changeInd++) {
-                    if (changes[changeInd].dtChanges < dateStart) {
+                    if (changes[changeInd].dtChanges < curDate) {
                         currentFlatCoast = changes[changeInd].prisePerMeter;
                     }
                 }
