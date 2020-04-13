@@ -26,8 +26,8 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-content id="scrolling-flats">
-      <v-container id="scroll-target">
+    <v-content>
+      <v-container fluid>
         <router-view></router-view>
       </v-container>
     </v-content>

@@ -1,6 +1,6 @@
 <template>
   <v-layout>
-    <v-container>
+    <v-container fluid>
       <chartItem v-for="chart in charts" :chartProperty="chart" :key="chart.id" />
     </v-container>
   </v-layout>
@@ -14,13 +14,15 @@ export default {
     chartItem
   },
 
-  data() {
+  data(){
     return {
-      charts: this.$store.getters.getAllCharts
-    };
+      charts: this.$store.getters.getCharts
+    }
   },
 
-  mounted() {},
+  mounted() {
+    if (this.charts.length == 0) this.$store.dispatch("GetLocalChart");
+  },
 
   methods: {}
 };

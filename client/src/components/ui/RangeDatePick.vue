@@ -33,12 +33,12 @@
 export default {
   data() {
     return {
-      // dates: [
-      //   `${this.dateStart.getFullYear()}-${this.dateStart.getMonth() +
-      //     1}-${this.dateEnd.getDate()}`,
-      //   `${this.dateEnd.getFullYear()}-${this.dateEnd.getMonth() +
-      //     1}-${this.dateStart.getDate()}`
-      // ],
+      dates: [
+        `${this.dateStart.getFullYear()}-${this.dateStart.getMonth() +
+          1}-${this.dateEnd.getDate()}`,
+        `${this.dateEnd.getFullYear()}-${this.dateEnd.getMonth() +
+          1}-${this.dateStart.getDate()}`
+      ],
       menu: false
     };
   },
@@ -55,23 +55,14 @@ export default {
   computed: {
     dateRangeText() {
       return this.dates.join(" ~ ");
-    },
-    dates: {
-      get() {
-        return [
-          `${this.dateStart.getFullYear()}-${this.dateStart.getMonth() +
-            1}-${this.dateEnd.getDate()}`,
-          `${this.dateEnd.getFullYear()}-${this.dateEnd.getMonth() +
-            1}-${this.dateStart.getDate()}`
-        ];
-      },
-      set(values) {
-        console.log('values', this);
-      }
     }
   },
   watch: {
-    dates(dates) {}
+    dates(dates) {
+      if (dates.length > 1) {
+        this.$emit("changeInterval", this.dates);
+      }
+    }
   }
 };
 </script>

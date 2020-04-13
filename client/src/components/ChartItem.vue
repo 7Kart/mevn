@@ -1,12 +1,12 @@
 <template>
-  <v-row class="mb-12">
+  <v-row class="xs-12">
     <!-- statistic chart container-->
-    <v-col md="8" sm="12">
+    <v-col md="7" xs="12" lg="9">
       <chart :chartdata="chartProperty.data" :options="chartProperty.chartOptions" />
     </v-col>
     <!-- chart's filter -->
-    <v-col align-self="center" md="4" sm="12">
-      <chartFilter :chartFilter="chartProperty.filter" />
+    <v-col align-self="center" md="5" xs="12" lg="3">
+      <chartFilter :chartId="chartProperty.id" :chartFilter="chartProperty.filter" />
     </v-col>
   </v-row>
 </template>

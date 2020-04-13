@@ -6,6 +6,7 @@ export default {
   props: ["chartdata", "options"],
   watch: {
     chartdata(value) {
+      console.log("watch", this.options);
       this.renderChart(value, this.options);
     }
   },
