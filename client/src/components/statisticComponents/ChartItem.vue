@@ -6,14 +6,14 @@
     </v-col>
     <!-- chart's filter -->
     <v-col align-self="center" md="5" xs="12" lg="3">
-      <chartFilter :chartId="chartProperty.id" :chartFilter="chartProperty.filter" />
+      <chartFilterItem :chartId="chartProperty.id" :chartFilter="chartProperty.filter" :chartLines="chartProperty.lines"/>
     </v-col>
   </v-row>
 </template>
 
 <script>
-import chart from "./charts/StatisticChart";
-import chartFilter from "./ChartFilterItem";
+import chart from "../charts/StatisticChart";
+import chartFilterItem from "./ChartFilterItem";
 
 export default {
   props: {
@@ -24,10 +24,8 @@ export default {
   },
   components: {
     chart,
-    chartFilter
+    chartFilterItem
   },
-
-  watch: {},
 
   mounted() {
     if (this.chartProperty.data.length == 0)

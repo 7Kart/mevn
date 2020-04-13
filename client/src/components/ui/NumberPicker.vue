@@ -1,5 +1,5 @@
 <template>
-  <v-input>
+  <v-input :hide-details="true">
     <v-icon slot="prepend" color="green" @click="changeValue(-1, iterator)">mdi-minus</v-icon>
     <v-icon slot="append" color="red" @click="changeValue(1, iterator)">mdi-plus</v-icon>
     <v-text-field
@@ -34,9 +34,9 @@ export default {
       type: Number,
       default: 1
     },
-    label:{
-        type: String,
-        default:"Undefined"
+    label: {
+      type: String,
+      default: "Undefined"
     }
   },
 

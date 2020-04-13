@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import chartItem from "../components/ChartItem";
+import chartItem from "../components/statisticComponents/ChartItem";
 
 export default {
   components: {

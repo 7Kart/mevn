@@ -3,6 +3,7 @@
     <v-list-item three-line>
       <v-list-item-content>
         <div class="overline mb-4 sm-12">ЦЕНА ЗА КВАДРАТ</div>
+        <!-- date range -->
         <div xs-12>
           <range-date-pick
             @changeInterval="onIntervalChange"
@@ -10,6 +11,7 @@
             :date-end="chartFilter.dtEnd"
           />
         </div>
+        <!-- step picker -->
         <div xs-12>
           <numberPicker
             label="Шаг интервала"
@@ -20,6 +22,10 @@
             @iteratorChanged="onIteratorChanged"
           />
         </div>
+        <!-- lines -->
+        <chartLine xs-12 v-for="(line, index) in chartLines" :line="line" :key="index">
+
+        </chartLine>
       </v-list-item-content>
     </v-list-item>
     <v-card-actions>
@@ -34,13 +40,15 @@
 </template>
 
 <script>
-import rangeDatePick from "./ui/RangeDatePick";
-import numberPicker from "./ui/NumberPicker";
+import rangeDatePick from "../ui/RangeDatePick";
+import numberPicker from "../ui/NumberPicker";
+import chartLine from "../statisticComponents/ChartLine"
 
 export default {
   components: {
     rangeDatePick,
-    numberPicker
+    numberPicker,
+    chartLine
   },
   props: {
     chartFilter: {
@@ -50,6 +58,10 @@ export default {
     chartId: {
       require: true,
       type: Number
+    },
+    chartLines:{
+      require: true,
+      type: Array
     }
   },
   methods: {
@@ -65,6 +77,9 @@ export default {
     onIteratorChanged(iterator) {
       this.chartFilter.intervalStep = iterator;
     }
-  }
+  },
+  mounted() {
+    console.log('lenes', this.chartLines);
+  },
 };
 </script>
