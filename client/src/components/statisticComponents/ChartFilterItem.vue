@@ -23,9 +23,7 @@
           />
         </div>
         <!-- lines -->
-        <chartLine xs-12 v-for="(line, index) in chartLines" :line="line" :key="index">
-
-        </chartLine>
+        <chartLine xs-12 v-for="(line, index) in chartLines" :line="line" :key="index" />
       </v-list-item-content>
     </v-list-item>
     <v-card-actions>
@@ -42,7 +40,7 @@
 <script>
 import rangeDatePick from "../ui/RangeDatePick";
 import numberPicker from "../ui/NumberPicker";
-import chartLine from "../statisticComponents/ChartLine"
+import chartLine from "../statisticComponents/ChartLine";
 
 export default {
   components: {
@@ -59,7 +57,7 @@ export default {
       require: true,
       type: Number
     },
-    chartLines:{
+    chartLines: {
       require: true,
       type: Array
     }
@@ -77,9 +75,6 @@ export default {
     onIteratorChanged(iterator) {
       this.chartFilter.intervalStep = iterator;
     }
-  },
-  mounted() {
-    console.log('lenes', this.chartLines);
-  },
+  }
 };
 </script>

@@ -3,15 +3,34 @@
     <div class="flex-grow-1 flex-shrink-1" :style="lineStyle"></div>
     <div class="flex-grow-1 text-center flex-shrink-0">{{line.label}}</div>
     <div class="flex-grow-1 text-right flex-shrink-0">
-      <v-btn icon>
-        <v-icon color="green">mdi-border-color</v-icon>
-      </v-btn>
+      <v-dialog v-model="dialog" persistent max-width="600px">
+        <template v-slot:activator="{ on }">
+          <v-btn icon dark v-on="on">
+            <v-icon color="green">mdi-border-color</v-icon>
+          </v-btn>
+        </template>
+        <chartLineDialog
+          @closeChartLineDialog="dialog=$event"
+          :line="line"
+          dialogTitle="Настроить фильтр"
+        />
+      </v-dialog>
     </div>
   </div>
 </template>
 
 <script>
+import chartLineDialog from "./ChartLineDialog";
+
 export default {
+  components: {
+    chartLineDialog
+  },
+  data() {
+    return {
+      dialog: true
+    };
+  },
   props: {
     line: {
       type: Object,
@@ -27,8 +46,10 @@ export default {
       };
     }
   },
-  mounted() {
-    console.log("!!!", this.line);
+  methods: {
+    openEditDialog() {
+      console.log("open dialog");
+    }
   }
 };
 </script>

@@ -14,24 +14,7 @@ export default {
                 payload.chartData.forEach(data => {
                     JSON.dateParser(data)
                 });
-
-                const meanValue = statisticBuilder(payload.chartData, chart.filter.dtStart, chart.filter.dtEnd, chart.filter.intervalStep)
-                chart.data = {
-                    labels: meanValue.map(
-                        state =>
-                            `${state.date.getDate()}. ${state.date.getMonth() +
-                            1}. ${state.date.getFullYear()}`
-                    ), datasets: [
-                        {
-                            label: "Цена за квадрат",
-                            backgroundColor: "#1565c057",
-                            borderColor: "#1565c0",
-                            borderWidth: 1,
-                            pointBorderColor: "#07519a",
-                            data: meanValue.map(state => state.meanValue)
-                        }
-                    ]
-                }
+                chart.data = chart.assemblyChartData(payload.chartData);
             }
         },
         GetLocalChart(state, charts) {

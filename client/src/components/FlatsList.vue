@@ -42,7 +42,10 @@ export default {
   methods: {
     onScroll(e) {
       if (!this.getFlatsLoadingStatus) {
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+        if (
+          window.innerHeight + Math.ceil(window.scrollY) >=
+          document.body.offsetHeight
+        ) {
           this.$store.dispatch("changePage");
           this.$store.dispatch("getFlats", this.getAllFilterValues);
         }
