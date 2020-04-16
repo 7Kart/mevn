@@ -4,7 +4,7 @@
       <v-list-item-content>
         <div class="overline mb-4 sm-12">ЦЕНА ЗА КВАДРАТ</div>
         <!-- date range -->
-        <div xs-12>
+        <div>
           <range-date-pick
             @changeInterval="onIntervalChange"
             :date-start="chart.filter.dtStart"
@@ -12,7 +12,7 @@
           />
         </div>
         <!-- step picker -->
-        <div xs-12>
+        <div>
           <numberPicker
             label="Шаг интервала"
             :value="chart.filter.intervalStep"
@@ -41,6 +41,7 @@
           @closeChartLineDialog="dialog=$event"
           :line="chart.getDefaultLine()"
           dialogTitle="Добавить фильтр"
+          @lineEdited="createNewLine"
         />
       </v-dialog>
     </v-card-actions>
@@ -72,13 +73,16 @@ export default {
     }
   },
   methods: {
+    createNewLine(newLine) {
+      console.log('newLine!!!!!!', newLine);
+      // this.chart.addNewLine(newLine);
+      // this.chart.getCommonFilter()
+    },
     onIntervalChange(dates) {
-      [this.chart.filter.dtStart, this.chart.filter.dtEnd] = dates.map(
-        date => {
-          const [year, month, day] = date.split("-");
-          return new Date(1 * year, 1 * month - 1, 1 * day);
-        }
-      );
+      [this.chart.filter.dtStart, this.chart.filter.dtEnd] = dates.map(date => {
+        const [year, month, day] = date.split("-");
+        return new Date(1 * year, 1 * month - 1, 1 * day);
+      });
     },
     acceptFilter() {
       this.$store.dispatch("GetChartData", this.chart.id);

@@ -77,6 +77,7 @@ DevelopersSchema.static('getAllProjects', function () {
         },
         {
             $project: {
+                "_id": 0,
                 "developerName": 1,
                 "developerId": 1,
                 "projectId": "$projects._id",

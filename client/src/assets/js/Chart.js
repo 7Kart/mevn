@@ -30,8 +30,7 @@ export default class {
             datasets.push({
                 ...line,
                 data: data
-            })
-
+            });
         });
 
         return {
@@ -42,16 +41,40 @@ export default class {
         }
     }
 
+    addNewLine(line) {
+        this.lines.push(line)
+    }
+
+    getCommonFilter() {
+        let filter = {
+            dtStart: this.filter.dtStart,
+            dtEnd: this.filter.dtEnd,
+        };
+        this.lines.forEach(line => {
+            // for (let key in line) {
+            //     if (filter.hasOwnProperty(key)) {
+
+            //     }
+            // }
+            console.log('line in chart', line);
+            line.getActiveFilter()
+        });
+    }
+
     getDefaultLine() {
-        return new ChartLine("Цена за квадрат",
-            "#1565c057",
-            "#1565c0",
-            1,
-            "#1565c0",
-            false,
-            true,
-            [],
-            "GetMeanValue")
+        const defaultLine = new ChartLine("Цена за квадрат",
+        "#1565c057",
+        "#1565c0",
+        2,
+        "#1565c0",
+        false,
+        true,
+        [],
+        "GetMeanValue")
+        
+        console.log('create line', defaultLine);
+
+        return defaultLine
     }
 
 }

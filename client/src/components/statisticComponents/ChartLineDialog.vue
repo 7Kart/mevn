@@ -35,8 +35,8 @@
           <v-row>
             <v-col>
               <v-combobox
-                v-model="projectsIds"
-                :items="editLine.projectsIds"
+                v-model="editLine.filter.projectsIds"
+                :items="developersProject"
                 label="Проекты застройщиков"
                 :item-text="formatCombobxItem"
                 item-value="projectId"
@@ -46,10 +46,10 @@
           </v-row>
           <v-row>
             <v-col>
-              <v-switch v-model="editLine.isFinished" :label="`Квартиры с отделкой`"></v-switch>
+              <v-switch v-model="editLine.filter.isFinished" :label="`Квартиры с отделкой`"></v-switch>
             </v-col>
             <v-col>
-              <v-switch v-model="editLine.isWhiteBox" label="WhiteBox"></v-switch>
+              <v-switch v-model="editLine.filter.isWhiteBox" label="WhiteBox"></v-switch>
             </v-col>
           </v-row>
         </v-container>
@@ -69,10 +69,6 @@ export default {
   components: {
     colorPicker
   },
-  mounted() {
-    console.log("this.editLine", this.editLine);
-    // if (this.line != null) this.editLine = { ...this.line };
-  },
   data() {
     return {
       formValid: true,
@@ -81,8 +77,7 @@ export default {
         { name: "Цвет линии", value: "borderColor" },
         { name: "Цвет фона", value: "backgroundColor" }
       ],
-      projectsIds: [],
-      editLine: { ...this.line }
+      editLine: this.line.getCopy()
     };
   },
   props: {
@@ -116,12 +111,7 @@ export default {
   },
   methods: {
     saveChanges() {
-      // if (this.line != null) {
-      //   for (let key in this.line) {
-      //     this.line[key] = this.editLine[key];
-      //   }
-      // }
-      this.$emit("closeChartLineDialog", flag);
+      this.$emit("lineEdited", this.editLine);
     },
     closeDialog(flag) {
       this.$emit("closeChartLineDialog", flag);

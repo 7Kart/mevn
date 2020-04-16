@@ -13,6 +13,7 @@
           @closeChartLineDialog="dialog=$event"
           :line="line"
           dialogTitle="Настроить фильтр"
+          @lineEdited="lineSave"
         />
       </v-dialog>
     </div>
@@ -28,7 +29,7 @@ export default {
   },
   data() {
     return {
-      dialog: true
+      dialog: false
     };
   },
   props: {
@@ -47,8 +48,9 @@ export default {
     }
   },
   methods: {
-    openEditDialog() {
-      console.log("open dialog");
+    lineSave(updatedLine) {
+      this.line.updateLine(updatedLine);
+      this.dialog = false;
     }
   }
 };
