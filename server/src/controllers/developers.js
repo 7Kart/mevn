@@ -1,4 +1,5 @@
-const Developer = require("../models/developer");
+const Developer = require("../models/developer"),
+    to = require('await-to-js').default;
 
 exports.getAllDevelopers = async (req, res, next) => {
     try {
@@ -20,4 +21,10 @@ exports.getDevelopersProjects = async (req, res, next) => {
     res.json({
         projects: projects
     })
+}
+
+exports.getAllDevelopersProjects = async (req, res, next) => {
+    let [err, projects] = await to(Developer.getAllProjects());
+    if (err) next(err)
+    res.json(projects)
 }

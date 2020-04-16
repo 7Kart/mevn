@@ -3,7 +3,8 @@ import axios from 'axios';
 export default {
     state: {
         developers: [],
-        developersProjects: []
+        developersProjects: [],
+        fullProjectsList: []
     },
     mutations: {
         getAllDevelopers(state, payload) {
@@ -11,6 +12,9 @@ export default {
         },
         getDevelopersProjects(state, payload) {
             state.developersProjects = payload;
+        },
+        getAllDevelopersProjects(state, payload) {
+            state.fullProjectsList = payload;
         }
     },
     actions: {
@@ -38,6 +42,15 @@ export default {
                 .catch(e => {
                     console.log(`QUERY ERROR`, e.response);
                 });
+        },
+        getAllDevelopersProjects({ commit }) {
+            axios.get(`${process.env.VUE_APP_HOST}/developers/getAllDevelopersProjects`)
+                .then(res => {
+                    commit("getAllDevelopersProjects", res.data);
+                })
+                .catch(e => {
+                    console.log(`QUERY ERROR`, e.response);
+                });
         }
     },
     getters: {
@@ -46,6 +59,9 @@ export default {
         },
         getDevelopersProject: state => {
             return state.developersProjects;
+        },
+        getAllProjects: state => {
+            return state.fullProjectsList;
         }
     },
 }

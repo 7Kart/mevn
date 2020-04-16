@@ -1,35 +1,28 @@
-import ChartDataBuilder from './ChartDataBuilder'
+import ChartDataBuilder from './ChartDataBuilder';
+import ChartLine from './ChartLine';
 
 export default class {
-    constructor(id, name = 'default chart', chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        fill: false
-    }, filter = {
-        dtStart: new Date(2020, 1, 1),
-        dtEnd: new Date(),
-        intervalStep: 5
-    }, lines = [{
-        label: "Цена за квадрат",
-        backgroundColor: "#1565c057",
-        borderColor: "#1565c0",
-        borderWidth: 1,
-        pointBorderColor: "#07519a",
-        action: "GetMeanValue"
-    }]) {
+    constructor(id, name, chartOptions, filter, lines = []) {
         this.id = id;
-        this.name = name;
-        this.chartOptions = chartOptions;
-        this.filter = filter;
+        this.name = name || 'default chart';
+        this.chartOptions = chartOptions || {
+            responsive: true,
+            maintainAspectRatio: false,
+            fill: false
+        };
+        this.filter = filter || {
+            dtStart: new Date(2020, 1, 1),
+            dtEnd: new Date(),
+            intervalStep: 5
+        };
         this.rowData = [];
         this.data = [];
         this.chartData = [];
         this.chartLabels = [];
-        this.lines = lines;
+        this.lines = lines.length == 0 ? [new ChartLine()] : lines;
     }
 
     assemblyChartData(rowData) {
-
         const chartsLabels = ChartDataBuilder.GetDateRange(this.filter);
         const datasets = []
         this.lines.forEach(line => {
@@ -47,6 +40,18 @@ export default class {
             ),
             datasets: datasets
         }
+    }
+
+    getDefaultLine() {
+        return new ChartLine("Цена за квадрат",
+            "#1565c057",
+            "#1565c0",
+            1,
+            "#1565c0",
+            false,
+            true,
+            [],
+            "GetMeanValue")
     }
 
 }

@@ -63,6 +63,29 @@ DevelopersSchema.static('getDevelopersProjects', function (developersIds) {
     ])
 });
 
+DevelopersSchema.static('getAllProjects', function () {
+    return this.aggregate([
+        {
+            "$project": {
+                "developerId": "$_id",
+                "developerName": "$name",
+                "projects": 1,
+            }
+        },
+        {
+            "$unwind": "$projects"
+        },
+        {
+            $project: {
+                "developerName": 1,
+                "developerId": 1,
+                "projectId": "$projects._id",
+                "projectName":"$projects.name"
+            }
+        }
+    ])
+})
+
 DevelopersSchema.static("getProjectsIds", function (developersIds) {
     developersIds = developersIds.map(el => {
         return new mongoose.Types.ObjectId(el);

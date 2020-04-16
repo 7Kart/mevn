@@ -22,6 +22,7 @@ export default {
 
   mounted() {
     if (this.charts.length == 0) this.$store.dispatch("GetLocalChart");
+    this.$store.dispatch("getAllDevelopersProjects")
   },
 
   methods: {}

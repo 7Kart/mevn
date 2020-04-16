@@ -6,7 +6,7 @@
     </v-col>
     <!-- chart's filter -->
     <v-col align-self="center" md="5" xs="12" lg="3">
-      <chartFilterItem :chartId="chartProperty.id" :chartFilter="chartProperty.filter" :chartLines="chartProperty.lines"/>
+      <chartFilterItem :chart="chartProperty"/>
     </v-col>
   </v-row>
 </template>

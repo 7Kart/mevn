@@ -25,8 +25,7 @@ export default {
 
   data() {
     return {
-      menu: false,
-      test: "true"
+      menu: false
     };
   },
   methods: {

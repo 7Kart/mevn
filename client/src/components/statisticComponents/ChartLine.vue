@@ -3,7 +3,7 @@
     <div class="flex-grow-1 flex-shrink-1" :style="lineStyle"></div>
     <div class="flex-grow-1 text-center flex-shrink-0">{{line.label}}</div>
     <div class="flex-grow-1 text-right flex-shrink-0">
-      <v-dialog v-model="dialog" persistent max-width="600px">
+      <v-dialog v-model="dialog" persistent max-width="700px">
         <template v-slot:activator="{ on }">
           <v-btn icon dark v-on="on">
             <v-icon color="green">mdi-border-color</v-icon>
@@ -34,7 +34,7 @@ export default {
   props: {
     line: {
       type: Object,
-      require: true
+      default: true
     }
   },
   computed: {

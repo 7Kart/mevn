@@ -7,15 +7,15 @@
         <div xs-12>
           <range-date-pick
             @changeInterval="onIntervalChange"
-            :date-start="chartFilter.dtStart"
-            :date-end="chartFilter.dtEnd"
+            :date-start="chart.filter.dtStart"
+            :date-end="chart.filter.dtEnd"
           />
         </div>
         <!-- step picker -->
         <div xs-12>
           <numberPicker
             label="Шаг интервала"
-            :value="chartFilter.intervalStep"
+            :value="chart.filter.intervalStep"
             :min="1"
             :iterator="1"
             :max="31"
@@ -23,16 +23,26 @@
           />
         </div>
         <!-- lines -->
-        <chartLine xs-12 v-for="(line, index) in chartLines" :line="line" :key="index" />
+        <chartLine xs-12 v-for="(line, index) in chart.lines" :line="line" :key="index" />
       </v-list-item-content>
     </v-list-item>
     <v-card-actions>
       <v-btn @click="acceptFilter()" color="success" small>Применить</v-btn>
       <v-btn small>Сбросить</v-btn>
       <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon color="green">mdi-plus</v-icon>
-      </v-btn>
+
+      <v-dialog v-model="dialog" persistent max-width="700px">
+        <template v-slot:activator="{ on }">
+          <v-btn v-on="on" icon>
+            <v-icon color="green">mdi-plus</v-icon>
+          </v-btn>
+        </template>
+        <chartLineDialog
+          @closeChartLineDialog="dialog=$event"
+          :line="chart.getDefaultLine()"
+          dialogTitle="Добавить фильтр"
+        />
+      </v-dialog>
     </v-card-actions>
   </v-card>
 </template>
@@ -41,39 +51,40 @@
 import rangeDatePick from "../ui/RangeDatePick";
 import numberPicker from "../ui/NumberPicker";
 import chartLine from "../statisticComponents/ChartLine";
+import chartLineDialog from "./ChartLineDialog";
 
 export default {
   components: {
     rangeDatePick,
     numberPicker,
-    chartLine
+    chartLine,
+    chartLineDialog
+  },
+  data() {
+    return {
+      dialog: false
+    };
   },
   props: {
-    chartFilter: {
+    chart: {
       require: true,
       type: Object
-    },
-    chartId: {
-      require: true,
-      type: Number
-    },
-    chartLines: {
-      require: true,
-      type: Array
     }
   },
   methods: {
     onIntervalChange(dates) {
-      [this.chartFilter.dtStart, this.chartFilter.dtEnd] = dates.map(date => {
-        const [year, month, day] = date.split("-");
-        return new Date(1 * year, 1 * month - 1, 1 * day);
-      });
+      [this.chart.filter.dtStart, this.chart.filter.dtEnd] = dates.map(
+        date => {
+          const [year, month, day] = date.split("-");
+          return new Date(1 * year, 1 * month - 1, 1 * day);
+        }
+      );
     },
     acceptFilter() {
-      this.$store.dispatch("GetChartData", this.chartId);
+      this.$store.dispatch("GetChartData", this.chart.id);
     },
     onIteratorChanged(iterator) {
-      this.chartFilter.intervalStep = iterator;
+      this.chart.filter.intervalStep = iterator;
     }
   }
 };
