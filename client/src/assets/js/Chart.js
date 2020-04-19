@@ -51,27 +51,21 @@ export default class {
             dtEnd: this.filter.dtEnd,
         };
         this.lines.forEach(line => {
-            // for (let key in line) {
-            //     if (filter.hasOwnProperty(key)) {
-
-            //     }
-            // }
-            console.log('line in chart', line);
             line.getActiveFilter()
         });
     }
 
     getDefaultLine() {
         const defaultLine = new ChartLine("Цена за квадрат",
-        "#1565c057",
-        "#1565c0",
-        2,
-        "#1565c0",
-        false,
-        true,
-        [],
-        "GetMeanValue")
-        
+            "#1565c057",
+            "#123242c0",
+            2,
+            "#1565c0",
+            false,
+            true,
+            [],
+            "GetMeanValue")
+
         console.log('create line', defaultLine);
 
         return defaultLine

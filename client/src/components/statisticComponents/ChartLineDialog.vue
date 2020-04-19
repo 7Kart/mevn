@@ -34,14 +34,14 @@
           </v-row>
           <v-row>
             <v-col>
-              <v-combobox
+              <v-autocomplete
                 v-model="editLine.filter.projectsIds"
                 :items="developersProject"
-                label="Проекты застройщиков"
                 :item-text="formatCombobxItem"
                 item-value="projectId"
+                label="Проекты"
                 multiple
-              ></v-combobox>
+              ></v-autocomplete>
             </v-col>
           </v-row>
           <v-row>
@@ -77,7 +77,7 @@ export default {
         { name: "Цвет линии", value: "borderColor" },
         { name: "Цвет фона", value: "backgroundColor" }
       ],
-      editLine: this.line.getCopy()
+      editLine: this.line
     };
   },
   props: {
@@ -108,7 +108,7 @@ export default {
         border: `${this.editLine.borderWidth}px solid ${this.editLine.borderColor}`
       };
     }
-  },
+  }, 
   methods: {
     saveChanges() {
       this.$emit("lineEdited", this.editLine);

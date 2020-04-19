@@ -74,9 +74,10 @@ export default {
   },
   methods: {
     createNewLine(newLine) {
-      console.log('newLine!!!!!!', newLine);
-      // this.chart.addNewLine(newLine);
-      // this.chart.getCommonFilter()
+      this.chart.addNewLine(newLine);
+      this.$store.dispatch("GetChartData", this.chart.id)
+      this.dialog = false;
+      //add save data
     },
     onIntervalChange(dates) {
       [this.chart.filter.dtStart, this.chart.filter.dtEnd] = dates.map(date => {

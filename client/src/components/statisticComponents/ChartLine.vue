@@ -11,7 +11,7 @@
         </template>
         <chartLineDialog
           @closeChartLineDialog="dialog=$event"
-          :line="line"
+          :line="line.getCopy()"
           dialogTitle="Настроить фильтр"
           @lineEdited="lineSave"
         />
@@ -55,4 +55,3 @@ export default {
   }
 };
 </script>
-

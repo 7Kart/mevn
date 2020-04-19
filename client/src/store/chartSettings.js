@@ -46,7 +46,7 @@ export default {
             }).catch(err => {
                 console.log('query error', err);
             });
-        }
+        },
     },
 
     getters: {
