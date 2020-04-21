@@ -1,5 +1,5 @@
 const Flats = require("../models/flat"),
-    Developer = require("../models/developer"),
+    ObjectId = require("mongoose").Types.ObjectId,
     to = require('await-to-js').default;
 
 
@@ -8,26 +8,33 @@ exports.GetStatisctics = async (req, res) => {
 
     let err = null, prices = [];
 
-    const startDate = new Date(req.query.dtStart);
-    const endDate = new Date(req.query.dtEnd)
+    const dtStart = new Date(req.query.dtStart)
+    const dtEnd = new Date(req.query.dtEnd)
+    dtStart.setHours(0, 0, 0, 0);
+    dtEnd.setHours(0, 0, 0, 0);
 
-    endDate.setHours(0, 0, 0, 0);
-    startDate.setHours(0, 0, 0, 0);
+    let queryFilter = {
+        dateInsert: { "$lte": dtEnd },
+        dtCheck: { "$gte": dtStart }
+    }
 
     limit = 100;
+    console.log('req.query.projectsIds', req.query.projectsIds);
+    if (req.query.projectsIds != undefined && req.query.projectsIds.length > 0) {
+        const projectsIds = req.query.projectsIds.map((id) => {
+            return new ObjectId(id);
+        })
+        queryFilter["projectId"] = {
+            "$in": projectsIds
+        }
+    }
 
-    let projId = "5e249cc11335fa000067e083"
-
-    const count = await Flats.count({
-        projectId: projId,
-        dateInsert: { $lte: endDate },
-        dtCheck: { $gte: startDate }
-    })
+    const count = await Flats.count(queryFilter)
 
     let promises = []
 
-    for (skip = 0; skip < count; skip += limit) {
-        promises.push(Flats.getFlatsCoastByPeriod(startDate, endDate, skip, limit))
+    for (let skip = 0; skip < count; skip += limit) {
+        promises.push(Flats.getFlatsCoastByPeriod(queryFilter, dtStart, dtEnd, skip, limit))
     }
 
     [err, results] = await to(Promise.all(promises))
@@ -41,8 +48,6 @@ exports.GetStatisctics = async (req, res) => {
 
     res.send(
         prices
-    )
+    );
 
 }
-
-// dateFinished

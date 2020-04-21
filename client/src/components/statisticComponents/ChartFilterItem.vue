@@ -22,7 +22,7 @@
             @iteratorChanged="onIteratorChanged"
           />
         </div>
-        <!-- lines -->
+        <!-- lines list-->
         <chartLine xs-12 v-for="(line, index) in chart.lines" :line="line" :key="index" />
       </v-list-item-content>
     </v-list-item>
@@ -75,7 +75,7 @@ export default {
   methods: {
     createNewLine(newLine) {
       this.chart.addNewLine(newLine);
-      this.$store.dispatch("GetChartData", this.chart.id)
+      //after line created
       this.dialog = false;
       //add save data
     },

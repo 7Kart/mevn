@@ -1,24 +1,31 @@
 export default class {
-    constructor(label, backgroundColor, borderColor, borderWidth, pointBorderColor, isFinished, isWhiteBox, projectsIds, action) {
+    constructor(label, backgroundColor, borderColor, borderWidth, pointBorderColor, isDesign = true, isWhiteBox = true, projectsIds, action, roomsCount, flatsCountRange) {
         this.label = label || "Цена за квадрат";
         this.backgroundColor = backgroundColor || "#1565c057";
         this.borderColor = borderColor || "#1565c0";
         this.borderWidth = borderWidth || 2;
         this.pointBorderColor = pointBorderColor || "#1565c0";
-
         this.action = action || "GetMeanValue";
         this.filter = {
-            isWhiteBox: typeof isWhiteBox === undefined ? true : isWhiteBox,
-            isFinished: typeof isFinished === undefined ? true : isFinished,
-            projectsIds: projectsIds || []
+            isWhiteBox: isWhiteBox,
+            isDesign: isDesign,
+            projectsIds: projectsIds || ["5e249cc11335fa000067e083"],
+            flatsCountRange: flatsCountRange || [1, 6]
         }
+        this.roomsCount = roomsCount || 0
     }
 
     getActiveFilter() {
-        console.log('getActiveFilter', this);
-        // for(let key in this.filter){
-        //     console.log('typeof this.filter[key]',key , typeof this.filter[key]);  
-        // }
+        let filter = {};
+        for (let key in this.filter) {
+            if (typeof this.filter[key] == "boolean") {
+                if (this.filter[key] === true)
+                    filter[key] = this.filter[key];
+            } else if (this.filter[key] instanceof Array && this.filter[key].length > 0) {
+                filter[key] = this.filter[key];
+            }
+        }
+        return filter;
     }
 
     getCopy() {

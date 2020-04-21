@@ -13,7 +13,7 @@ export default class {
         this.filter = filter || {
             dtStart: new Date(2020, 1, 1),
             dtEnd: new Date(),
-            intervalStep: 5
+            intervalStep: 1
         };
         this.rowData = [];
         this.data = [];
@@ -26,7 +26,14 @@ export default class {
         const chartsLabels = ChartDataBuilder.GetDateRange(this.filter);
         const datasets = []
         this.lines.forEach(line => {
-            const data = ChartDataBuilder[line.action](chartsLabels, rowData)
+            const filteredData = rowData.filter(flat => {
+                if (line.filter.hasOwnProperty("projectsIds")) {
+                    if (line.filter.projectsIds.indexOf(flat.projectId) === -1)
+                        return false;
+                }
+                return true
+            })
+            const data = ChartDataBuilder[line.action](chartsLabels, filteredData)
             datasets.push({
                 ...line,
                 data: data
@@ -49,14 +56,40 @@ export default class {
         let filter = {
             dtStart: this.filter.dtStart,
             dtEnd: this.filter.dtEnd,
+            flatsCountRange: [],
+            projectsIds: [],
+            isWhiteBox: [],
+            isDesign: []
         };
         this.lines.forEach(line => {
-            line.getActiveFilter()
+            const linesFilters = line.filter;
+            for (let key in linesFilters) {
+                if (key == "isWhiteBox" || key == "isDesign") {
+                    if (filter[key].indexOf(linesFilters[key]) == -1) {
+                        filter[key].push(linesFilters[key])
+                    }
+                } else if (key == "flatsCountRange") {
+                    for (let i = linesFilters[key][0]; i <= linesFilters[key][1]; i++) {
+                        if (filter[key].indexOf(i) == -1) {
+                            filter[key].push(i);
+                        }
+                    }
+                } else if (key == "projectsIds") {
+                    for (let id of linesFilters[key]) {
+                        if (filter[key].indexOf(id) == -1) {
+                            filter[key].push(id)
+                        }
+                    }
+                }
+            }
         });
+
+        console.log('redy filter', filter);
+        return filter;
     }
 
     getDefaultLine() {
-        const defaultLine = new ChartLine("Цена за квадрат",
+        return new ChartLine("Цена за квадрат",
             "#1565c057",
             "#123242c0",
             2,
@@ -65,12 +98,6 @@ export default class {
             true,
             [],
             "GetMeanValue")
-
-        console.log('create line', defaultLine);
-
-        return defaultLine
     }
 
 }
-
-

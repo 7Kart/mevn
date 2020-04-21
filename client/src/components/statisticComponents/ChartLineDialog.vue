@@ -33,6 +33,7 @@
             <v-col sm="4" :style="fullStyleLine"></v-col>
           </v-row>
           <v-row>
+            <!-- developer's project -->
             <v-col>
               <v-autocomplete
                 v-model="editLine.filter.projectsIds"
@@ -46,7 +47,20 @@
           </v-row>
           <v-row>
             <v-col>
-              <v-switch v-model="editLine.filter.isFinished" :label="`Квартиры с отделкой`"></v-switch>
+              <v-range-slider
+                v-model="test"
+                :max="10"
+                :min="1"
+                :hide-details="true"
+                thumb-label="always"
+                :thumb-size="24"
+                label="Количество комнат"
+              ></v-range-slider>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-switch v-model="editLine.filter.isDesign" :label="`Квартиры с отделкой`"></v-switch>
             </v-col>
             <v-col>
               <v-switch v-model="editLine.filter.isWhiteBox" label="WhiteBox"></v-switch>
@@ -64,12 +78,15 @@
 </template>
 <script>
 import colorPicker from "../ui/ColorPicker";
+import numberPicker from "../ui/NumberPicker";
 
 export default {
   components: {
-    colorPicker
+    colorPicker,
+    numberPicker
   },
   data() {
+    console.log("this line", this.line);
     return {
       formValid: true,
       activeChartComponent: "borderColor",
@@ -77,6 +94,7 @@ export default {
         { name: "Цвет линии", value: "borderColor" },
         { name: "Цвет фона", value: "backgroundColor" }
       ],
+      test:[1,4],
       editLine: this.line
     };
   },
@@ -88,6 +106,11 @@ export default {
     line: {
       required: true,
       type: Object
+    }
+  },
+  watch: {
+    line(v) {
+      this.editLine = v;
     }
   },
   computed: {
@@ -108,7 +131,7 @@ export default {
         border: `${this.editLine.borderWidth}px solid ${this.editLine.borderColor}`
       };
     }
-  }, 
+  },
   methods: {
     saveChanges() {
       this.$emit("lineEdited", this.editLine);

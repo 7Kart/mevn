@@ -142,15 +142,10 @@ FlatSchema.static("getFlatsCoastByDate", function (date, skip, limit) {
 });
 
 
-FlatSchema.static("getFlatsCoastByPeriod", function (dtStart, dtEnd, skip, limit) {
+FlatSchema.static("getFlatsCoastByPeriod", function (filter, dtStart, dtEnd, skip, limit) {
     return this.aggregate([
         {
-            $match: {
-                // projectId: new mongoose.Types.ObjectId("5e249bd51335fa000067e080"),
-                projectId: new mongoose.Types.ObjectId("5e249cc11335fa000067e083"),
-                dateInsert: { $lte: dtEnd },
-                dtCheck: { $gte: dtStart }
-            }
+            $match: filter
         },
         {
             $skip: skip
@@ -164,6 +159,12 @@ FlatSchema.static("getFlatsCoastByPeriod", function (dtStart, dtEnd, skip, limit
                 prisePerMeter: 1,
                 dateInsert: 1,
                 dtCheck: 1,
+                projectId: 1,
+                whitebox: 1,
+                floor: 1,
+                design: 1,
+                roomsCount: 1,
+                area: 1,
                 changes: {
                     $filter: {
                         input: "$changes",

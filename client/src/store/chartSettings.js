@@ -1,5 +1,4 @@
 import axios from "axios";
-import statisticBuilder from '../assets/js/statisticBuilder'
 import Chart from '../assets/js/Chart'
 
 export default {
@@ -25,19 +24,16 @@ export default {
     actions: {
         GetLocalChart({ commit }) {
             let chart = new Chart(1);
-            let chart1 = new Chart(2);
             commit("GetLocalChart", [chart]);
         },
         GetChartData({ commit, state }, idChart) {
             const chart = state.charts.find(chart => {
                 return chart.id == idChart;
             });
-
+            //get all lines' filters to common object            
+            const queryFilter = chart.getCommonFilter()
             axios.get(`${process.env.VUE_APP_HOST}/statistics/GetStatistics`, {
-                params: {
-                    dtStart: chart.filter.dtStart,
-                    dtEnd: chart.filter.dtEnd,
-                }
+                params: queryFilter
             }).then(res => {
                 commit('GetChartData', {
                     chartData: res.data,

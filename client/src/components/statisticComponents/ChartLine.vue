@@ -46,7 +46,7 @@ export default {
         height: "15px"
       };
     }
-  },
+  }, 
   methods: {
     lineSave(updatedLine) {
       this.line.updateLine(updatedLine);

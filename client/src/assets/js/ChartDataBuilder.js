@@ -3,12 +3,15 @@ export default class ChartDataBuilder {
     static GetDateRange({ dtStart, dtEnd, intervalStep }) {
         let dates = [];
         let curDate = new Date(dtStart);
+        dtEnd.setHours(0, 0, 0, 0);
         while (curDate <= dtEnd) {
             dates.push(new Date(curDate));
             curDate.setDate(curDate.getDate() + intervalStep)
         }
-        if (curDate != dtEnd)
+
+        if (curDate.getTime() > dtEnd.getTime() && dates[dates.length - 1].getTime() != dtEnd.getTime()) {
             dates.push(new Date(dtEnd));
+        }
         return dates
     }
 
