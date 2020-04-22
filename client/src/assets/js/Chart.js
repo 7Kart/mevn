@@ -25,11 +25,16 @@ export default class {
     assemblyChartData(rowData) {
         const chartsLabels = ChartDataBuilder.GetDateRange(this.filter);
         const datasets = []
-        this.lines.forEach(line => {
+        for(let line of this.lines){
             const filteredData = rowData.filter(flat => {
-                if (line.filter.hasOwnProperty("projectsIds")) {
+                if (line.filter.hasOwnProperty("projectsIds") && line.filter.projectsIds.length > 0) {
                     if (line.filter.projectsIds.indexOf(flat.projectId) === -1)
                         return false;
+                }
+                if (line.filter.hasOwnProperty("flatsCountRange") && line.filter.flatsCountRange.length > 0) {
+                    if (line.filter.flatsCountRange[0] > flat.roomsCount || flat.roomsCount > line.filter.flatsCountRange[1]) {
+                        return false;
+                    }
                 }
                 return true
             })
@@ -38,7 +43,7 @@ export default class {
                 ...line,
                 data: data
             });
-        });
+        };
 
         return {
             labels: chartsLabels.map(
@@ -96,8 +101,9 @@ export default class {
             "#1565c0",
             false,
             true,
-            [],
-            "GetMeanValue")
+            ["5e249cc11335fa000067e083"],
+            "GetMeanValue",
+            [1,6])
     }
 
 }

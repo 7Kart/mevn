@@ -19,13 +19,21 @@ exports.GetStatisctics = async (req, res) => {
     }
 
     limit = 100;
-    console.log('req.query.projectsIds', req.query.projectsIds);
     if (req.query.projectsIds != undefined && req.query.projectsIds.length > 0) {
         const projectsIds = req.query.projectsIds.map((id) => {
             return new ObjectId(id);
         })
         queryFilter["projectId"] = {
             "$in": projectsIds
+        }
+    }
+
+    if (req.query.flatsCountRange != undefined && req.query.flatsCountRange.length > 0) {
+        const flatsCountRange = req.query.flatsCountRange.map((count) => {
+            return 1*count
+        })
+        queryFilter["roomsCount"] = {
+            "$in": flatsCountRange
         }
     }
 
@@ -45,6 +53,8 @@ exports.GetStatisctics = async (req, res) => {
             return arr;
         }, [])
     }
+
+    console.log('req query', req.query);
 
     res.send(
         prices

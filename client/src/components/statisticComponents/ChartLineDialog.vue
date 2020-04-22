@@ -8,7 +8,7 @@
         <v-container>
           <v-row>
             <v-col cols="12" xs="12">
-              <v-text-field label="Название графика" required v-model="editLine.label"></v-text-field>
+              <v-text-field label="Название графика" required v-model="line.label"></v-text-field>
             </v-col>
           </v-row>
           <v-row align="center">
@@ -24,7 +24,7 @@
               ></v-select>
             </v-col>
             <v-col sm="2">
-              <colorPicker :color="curentColor" @changeColor="(curentColor=$event)">
+              <colorPicker :color="curentColor" @changeColor="(onColorChange($event))">
                 <template v-slot:colorPickerActive="{on}">
                   <v-col :style="{'background-color':curentColor}" v-on="on"></v-col>
                 </template>
@@ -36,7 +36,7 @@
             <!-- developer's project -->
             <v-col>
               <v-autocomplete
-                v-model="editLine.filter.projectsIds"
+                v-model="line.filter.projectsIds"
                 :items="developersProject"
                 :item-text="formatCombobxItem"
                 item-value="projectId"
@@ -48,7 +48,7 @@
           <v-row>
             <v-col>
               <v-range-slider
-                v-model="test"
+                v-model="line.filter.flatsCountRange"
                 :max="10"
                 :min="1"
                 :hide-details="true"
@@ -60,10 +60,10 @@
           </v-row>
           <v-row>
             <v-col>
-              <v-switch v-model="editLine.filter.isDesign" :label="`Квартиры с отделкой`"></v-switch>
+              <v-switch v-model="line.filter.isDesign" :label="`Квартиры с отделкой`"></v-switch>
             </v-col>
             <v-col>
-              <v-switch v-model="editLine.filter.isWhiteBox" label="WhiteBox"></v-switch>
+              <v-switch v-model="line.filter.isWhiteBox" label="WhiteBox"></v-switch>
             </v-col>
           </v-row>
         </v-container>
@@ -86,16 +86,15 @@ export default {
     numberPicker
   },
   data() {
-    console.log("this line", this.line);
     return {
+      backgroundColor: this.line.backgroundColor,
+      borderColor: this.line.borderColor,
       formValid: true,
       activeChartComponent: "borderColor",
       chartComponents: [
         { name: "Цвет линии", value: "borderColor" },
         { name: "Цвет фона", value: "backgroundColor" }
-      ],
-      test:[1,4],
-      editLine: this.line
+      ]
     };
   },
   props: {
@@ -108,39 +107,33 @@ export default {
       type: Object
     }
   },
-  watch: {
-    line(v) {
-      this.editLine = v;
-    }
-  },
   computed: {
-    curentColor: {
-      get() {
-        return this.editLine[this.activeChartComponent];
-      },
-      set(v) {
-        this.editLine[this.activeChartComponent] = v;
-      }
+    curentColor() {
+      return this[this.activeChartComponent];
     },
     developersProject() {
       return this.$store.getters.getAllProjects;
     },
     fullStyleLine() {
       return {
-        "background-color": this.editLine.backgroundColor,
-        border: `${this.editLine.borderWidth}px solid ${this.editLine.borderColor}`
+        "background-color": this.line.backgroundColor,
+        border: `${this.line.borderWidth}px solid ${this.line.borderColor}`
       };
     }
   },
   methods: {
     saveChanges() {
-      this.$emit("lineEdited", this.editLine);
+      this.$emit("lineEdited", this.line);
     },
     closeDialog(flag) {
       this.$emit("closeChartLineDialog", flag);
     },
     formatCombobxItem(project) {
       return `${project.projectName} (${project.developerName})`;
+    },
+    onColorChange(color) {
+      this.line[this.activeChartComponent] = color;
+      this[this.activeChartComponent] = this.line[this.activeChartComponent];
     }
   }
 };

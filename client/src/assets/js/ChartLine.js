@@ -1,5 +1,5 @@
 export default class {
-    constructor(label, backgroundColor, borderColor, borderWidth, pointBorderColor, isDesign = true, isWhiteBox = true, projectsIds, action, roomsCount, flatsCountRange) {
+    constructor(label, backgroundColor, borderColor, borderWidth, pointBorderColor, isDesign = true, isWhiteBox = true, projectsIds, action, flatsCountRange) {
         this.label = label || "Цена за квадрат";
         this.backgroundColor = backgroundColor || "#1565c057";
         this.borderColor = borderColor || "#1565c0";
@@ -12,7 +12,6 @@ export default class {
             projectsIds: projectsIds || ["5e249cc11335fa000067e083"],
             flatsCountRange: flatsCountRange || [1, 6]
         }
-        this.roomsCount = roomsCount || 0
     }
 
     getActiveFilter() {
@@ -37,10 +36,12 @@ export default class {
             this.filter.isFinished,
             this.filter.isWhiteBox,
             this.filter.projectsIds,
-            this.action)
+            this.action,
+            this.filter.flatsCountRange)
     }
 
     updateLine(newLine) {
+        console.log('update line', newLine);
         for (let key in this) {
             this[key] = newLine[key]
         }
