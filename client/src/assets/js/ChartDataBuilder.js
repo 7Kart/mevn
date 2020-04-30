@@ -16,7 +16,6 @@ export default class ChartDataBuilder {
     }
 
     static GetMeanValue(dates, flats) {
-
         let meanValues = [];
 
         for (let date of dates) {
@@ -30,14 +29,16 @@ export default class ChartDataBuilder {
                     coast: flat.coast,
                     dtChanges: flat.dtCheck
                 });
-                let currentFlatCoast = changes[0].prisePerMeter;
 
-                for (let changeInd = 1; changeInd < changes.length; changeInd++) {
-                    if (changes[changeInd].dtChanges < date) {
-                        currentFlatCoast = changes[changeInd].prisePerMeter;
+                if (flat.dateInsert <= date && date <= flat.dtCheck) {
+                    let currentFlatCoast = changes[0].prisePerMeter;
+                    for (let changeInd = 1; changeInd < changes.length; changeInd++) {
+                        if (changes[changeInd].dtChanges < date) {
+                            currentFlatCoast = changes[changeInd].prisePerMeter;
+                        }
                     }
+                    coasts.push(currentFlatCoast)
                 }
-                coasts.push(currentFlatCoast)
             });
             const meanValue = coasts.reduce((sum, coast) => sum + coast, 0) / coasts.length
             meanValues.push(meanValue.toFixed(2));
