@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const morgan = require('morgan');
-const cron = require('../src/cron/shedule.js');
+const cron = require('./cron/shedule.js');
 const path = require('path');
 
 require('dotenv').config()
