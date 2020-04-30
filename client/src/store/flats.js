@@ -32,7 +32,9 @@ export default {
         getFlats({ state, commit }, payload) {
 
             commit("changeLoadFlatFlag", true);
-            axios.get(`${process.env.VUE_APP_HOST}/flats/GetFlats`, {
+            
+            axios.get(`${process.env.BASE_URL}/flats/GetFlats`, {
+            // axios.get(`${process.env.VUE_APP_HOST}/flats/GetFlats`, {
                 params: {
                     page: state.currentPage,
                     ...payload
