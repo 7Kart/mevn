@@ -1,14 +1,17 @@
 <template>
-  <v-app id="scrolling-flats">
+  <v-app id="scrolling-flats" v-scroll="onScroll">
     <v-app-bar
       :clipped-left="$vuetify.breakpoint.lgAndUp"
       app
       color="blue darken-3"
-      :collapse-on-scroll="true"
+      :collapse="!collapseOnScroll"
+      :collapse-on-scroll="collapseOnScroll"            
       dark
+      dense
     >
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+
       <v-toolbar-title>
-        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         <span class="hidden-sm-and-down">Hives</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
@@ -20,7 +23,7 @@
       </v-container>
     </v-content>
 
-    <v-navigation-drawer v-model="drawer" app clipped>
+    <v-navigation-drawer v-model="drawer" app clipped  :mini-variant.sync="mini">
       <v-list nav dense>
         <v-list-item-group active-class="light-blue--text text--darken-4">
           <v-list-item v-for="item in items" :key="item.title" :to="item.href" link>
@@ -44,9 +47,16 @@ export default {
   mounted() {
     this.$store.dispatch("getFlats");
   },
+  methods: {
+    onScroll(){
+      console.log('here');  
+      this.mini = true;
+    }
+  },
   data: () => ({
     drawer: false,
-    mini: true,
+    collapseOnScroll: true,
+    mini: false,
     group: null,
     items: [
       { title: "Квартиры", icon: "mdi-home-city", href: "/" },
